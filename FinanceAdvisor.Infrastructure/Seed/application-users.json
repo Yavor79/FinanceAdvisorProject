@@ -1,0 +1,54 @@
+[
+  {
+    "Id": "b1a1d2f3-4e55-4f32-9b29-8df2d1eae711",
+    "Email": "alice@example.com",
+    "UserName": "alice",
+    "NormalizedUserName": "ALICE",
+    "NormalizedEmail": "ALICE@EXAMPLE.COM",
+    "EmailConfirmed": true,
+    "PhoneNumber": "1234567890",
+    "PhoneNumberConfirmed": true,
+    "LockoutEnabled": false,
+    "CreatedAt": "2023-01-15T09:25:00",
+    "IsDeleted": false
+  },
+  {
+    "Id": "c2b2e3f4-5a66-4a01-8c92-a7b2e8f3d9a1",
+    "Email": "bob@example.com",
+    "UserName": "bob1984",
+    "NormalizedUserName": "BOB1984",
+    "NormalizedEmail": "BOB@EXAMPLE.COM",
+    "EmailConfirmed": false,
+    "PhoneNumber": "0987654321",
+    "PhoneNumberConfirmed": false,
+    "LockoutEnabled": true,
+    "CreatedAt": "2023-02-20T14:10:00",
+    "IsDeleted": false
+  },
+  {
+    "Id": "d3c3f4a5-6b77-4e32-83ac-3fe3d4b9c233",
+    "Email": "charlie@example.com",
+    "UserName": "charlie_dev",
+    "NormalizedUserName": "CHARLIE_DEV",
+    "NormalizedEmail": "CHARLIE@EXAMPLE.COM",
+    "EmailConfirmed": true,
+    "PhoneNumber": "1112223333",
+    "PhoneNumberConfirmed": true,
+    "LockoutEnabled": false,
+    "CreatedAt": "2023-03-05T19:00:00",
+    "IsDeleted": false
+  },
+  {
+    "Id": "e4d4a5b6-7c88-4f43-9adf-4ae4e5c6d344",
+    "Email": "diana@example.com",
+    "UserName": "diana.d",
+    "NormalizedUserName": "DIANA.D",
+    "NormalizedEmail": "DIANA@EXAMPLE.COM",
+    "EmailConfirmed": true,
+    "PhoneNumber": "2223334444",
+    "PhoneNumberConfirmed": false,
+    "LockoutEnabled": true,
+    "CreatedAt": "2023-04-10T07:45:00",
+    "IsDeleted": true
+  }
+]
