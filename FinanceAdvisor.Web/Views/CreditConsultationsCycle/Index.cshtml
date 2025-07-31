@@ -1,0 +1,29 @@
+﻿@model IEnumerable<FinanceAdvisor.Web.Models.CreditConsultationCycleViewModel>
+
+<h2>Credit Consultation Cycles</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Advisor</th>
+            <th>Credit Type</th>
+            <th>Status</th>
+            <th>Meetings</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ClientId</td>
+                <td>@item.AdvisorId</td>
+                <td>@item.CreditType</td>
+                <td>@item.Status</td>
+                <td>@item.MeetingCount</td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
