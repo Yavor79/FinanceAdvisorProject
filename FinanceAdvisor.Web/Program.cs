@@ -1,3 +1,4 @@
+using FinanceAdvisor.Web.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 
@@ -23,7 +24,7 @@ namespace FinanceAdvisor.Web
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
-            builder.Services.AddAutoMapper(typeof(Program));
+            builder.Services.AddAutoMapper(typeof(AdvisorProfile).Assembly);
 
             builder.Services.AddControllersWithViews();
 
