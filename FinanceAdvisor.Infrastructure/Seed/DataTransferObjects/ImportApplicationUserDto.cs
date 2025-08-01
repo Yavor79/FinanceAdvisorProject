@@ -1,9 +1,10 @@
-﻿namespace FinanceAdvisor.Data.Seeding.DataTransferObjects
+﻿namespace FinanceAdvisor.Infrastructure.Seed.DataTransferObjects
 {
     using System.ComponentModel.DataAnnotations;
     using AutoMapper;
-    using FinanceAdvisor.Infrastructure.Identity;
-    
+
+    //using FinanceAdvisor.Infrastructure.Identity;
+
 
     public class ImportApplicationUserDto
     {
@@ -38,8 +39,8 @@
         public void CreateMappings(IProfileExpression configuration)
         {
             configuration
-                .CreateMap<ImportApplicationUserDto, ApplicationUser>();
-                //.ForMember(d => d.Id, opt => opt.MapFrom(s => Guid.Parse(s.Id)));
+                .CreateMap<ImportApplicationUserDto, User>();
+            //.ForMember(d => d.Id, opt => opt.MapFrom(s => Guid.Parse(s.Id)));
         }
     }
 }

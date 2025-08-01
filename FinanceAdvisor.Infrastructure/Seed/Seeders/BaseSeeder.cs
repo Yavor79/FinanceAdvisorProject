@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinanceAdvisor.Infrastructure.Seed
+namespace FinanceAdvisor.Infrastructure.Seed.Seeders
 {
     public abstract class BaseSeeder<TEntity, TDto>
         where TEntity : class
@@ -72,12 +72,12 @@ namespace FinanceAdvisor.Infrastructure.Seed
 
                 if (newEntitiesToAdd.Any(e => EntityExists(e, dto)))
                     continue;
-                
+
                 var entity = AutoMapperConfig.MapperInstance.Map<TEntity>(dto);
                 entity = await PostProcessEntityAsync(entity, dto);
 
                 newEntitiesToAdd.Add(entity);
-                
+
             }
 
             await _dbContext.Set<TEntity>().AddRangeAsync(newEntitiesToAdd);

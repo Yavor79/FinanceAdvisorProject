@@ -1,10 +1,10 @@
 ﻿using FinanceAdvisor.Domain.Entities;
-using FinanceAdvisor.Data.Seeding.DataTransferObjects;
-using FinanceAdvisor.Infrastructure.Seed;
+using FinanceAdvisor.Infrastructure.Seed.DataTransferObjects;
+using FinanceAdvisor.Infrastructure.Seed.Seeders;
 
 public class AdvisorSeeder : BaseSeeder<Advisor, ImportAdvisorDto>
 {
-    protected override string JsonFilePath => @"C:\Users\USER\Programming\C_Sharp\Finance_Project\FinanceAdvisor\FinanceAdvisor.Infrastructure\Seed\application-advisors.json";
+    protected override string JsonFilePath => @"C:\Users\USER\Programming\C_Sharp\Finance_Project\FinanceAdvisor\FinanceAdvisor.Infrastructure\Seed\seedData\application-advisors.json";
 
     protected override bool EntityExists(Advisor existingEntity, ImportAdvisorDto newDto)
     {

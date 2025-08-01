@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-
-using FinanceAdvisor.Data.Seeding.DataTransferObjects;
-using FinanceAdvisor.Infrastructure.Identity;
+using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Infrastructure.Seed.DataTransferObjects;
+//using FinanceAdvisor.Infrastructure.Identity;
 
 public static class AutoMapperConfig
 {
@@ -23,6 +23,12 @@ public static class AutoMapperConfig
 
             var cDto = new ImportCreditConsultationCycleDto();
             cDto.CreateMappings(cfg);
+
+            var consultationDto = new ImportConsultationDto();
+            consultationDto.CreateMappings(cfg);
+
+            var meetingDto = new ImportMeetingDto();
+            meetingDto.CreateMappings(cfg);
         });
 
        

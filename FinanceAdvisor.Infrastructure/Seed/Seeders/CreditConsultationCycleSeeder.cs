@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using FinanceAdvisor.Data.Seeding.DataTransferObjects;
 using FinanceAdvisor.Domain.Entities;
-using FinanceAdvisor.Infrastructure.Seed;
+using FinanceAdvisor.Infrastructure.Seed.DataTransferObjects;
+using FinanceAdvisor.Infrastructure.Seed.Seeders;
 
 public class CreditConsultationCycleSeeder : BaseSeeder<CreditConsultationCycle, ImportCreditConsultationCycleDto>
 {
     protected override string JsonFilePath =>
-        @"C:\Users\USER\Programming\C_Sharp\Finance_Project\FinanceAdvisor\FinanceAdvisor.Infrastructure\Seed\application-creaditConsultationCycles.json";
+        @"C:\Users\USER\Programming\C_Sharp\Finance_Project\FinanceAdvisor\FinanceAdvisor.Infrastructure\Seed\seedData\application-creaditConsultationCycles.json";
 
     // Check if entity already exists by comparing IDs (since Id is Guid primary key)
     protected override bool EntityExists(CreditConsultationCycle existingEntity, ImportCreditConsultationCycleDto newDto)

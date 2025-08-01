@@ -6,13 +6,15 @@ using FinanceAdvisor.Infrastructure;
 using FinanceAdvisor.Infrastructure.Repository;
 //using FinanceAdvisor.Infrastructure.Seed;
 //using static FinanceAdvisor.Infrastructure.Seed.DbSeeder;
-using FinanceAdvisor.Infrastructure.Identity;
+//using FinanceAdvisor.Infrastructure.Identity;
 using FinanceAdvisor.Application.Interfaces;
 using FinanceAdvisor.Application.Services;
 using FinanceAdvisor.Application.IRepos;
 using FinanceAdvisor.Infrastructure.Extensions;
-using FinanceAdvisor.Infrastructure.Repository;
+
 using Microsoft.EntityFrameworkCore.Internal;
+using FinanceAdvisor.Infrastructure.Seed.Seeders;
+
 
 
 namespace FinanceAdvisor
@@ -37,14 +39,14 @@ namespace FinanceAdvisor
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
           
 
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
             {
                 ConfigureIdentity(builder, options);
             })
             .AddEntityFrameworkStores<FinanceDbContext>()
             .AddRoles<IdentityRole<Guid>>()
-            .AddSignInManager<SignInManager<ApplicationUser>>()
-            .AddUserManager<UserManager<ApplicationUser>>();
+            .AddSignInManager<SignInManager<User>>()
+            .AddUserManager<UserManager<User>>();
 
             builder.Services.AddCors(options =>
             {
@@ -66,22 +68,29 @@ namespace FinanceAdvisor
 
             var app = builder.Build();
 
-            //AutoMapperConfig.Initialize();
+            AutoMapperConfig.Initialize();
 
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var services = scope.ServiceProvider;
+            // TODO: Create create extension method for instancing all Seeders
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
 
-            //    var appUserSeeder = new ApplicationUserSeeder();
-            //    await appUserSeeder.SeedAsync(services);
+                //var appUserSeeder = new ApplicationUserSeeder();
+                //await appUserSeeder.SeedAsync(services);
 
-            //    var advisorSeeder = new AdvisorSeeder();
-            //    await advisorSeeder.SeedAsync(services);
+                //var advisorSeeder = new AdvisorSeeder();
+                //await advisorSeeder.SeedAsync(services);
 
-            //    var consultationSeeder = new CreditConsultationCycleSeeder();
-            //    await consultationSeeder.SeedAsync(services);
-            //}/
-            
+                //var consultationCycleSeeder = new CreditConsultationCycleSeeder();
+                //await consultationCycleSeeder.SeedAsync(services);
+
+                var consultationSeeder = new ConsultationSeeder();
+                await consultationSeeder.SeedAsync(services);
+
+                var meetingSeeder = new MeetingSeeder();
+                await meetingSeeder.SeedAsync(services);
+            }
+
 
             app.UseCors("AllowMVC");
             //using (var scope = app.Services.CreateScope())

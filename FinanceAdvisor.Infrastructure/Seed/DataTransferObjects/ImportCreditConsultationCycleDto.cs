@@ -5,7 +5,7 @@ using AutoMapper;
 using FinanceAdvisor.Domain.Entities;
 using FinanceAdvisor.Domain.Enums;
 
-namespace FinanceAdvisor.Data.Seeding.DataTransferObjects
+namespace FinanceAdvisor.Infrastructure.Seed.DataTransferObjects
 {
     public class ImportCreditConsultationCycleDto
     {
