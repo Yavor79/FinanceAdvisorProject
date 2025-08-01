@@ -1,6 +1,6 @@
 ﻿using FinanceAdvisor.Domain.Entities;
 using FinanceAdvisor.Infrastructure.EntityConfigurations;
-using FinanceAdvisor.Infrastructure.Identity;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
@@ -10,14 +10,14 @@ using System.Reflection;
 
 namespace FinanceAdvisor.Infrastructure
 {
-    public class FinanceDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class FinanceDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public FinanceDbContext(DbContextOptions<FinanceDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        //public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Advisor> Advisors { get; set; }
         public DbSet<Consultation> Consultations { get; set; }
         public DbSet<CreditConsultationCycle> CreditConsultationCycles { get; set; }
@@ -38,9 +38,10 @@ namespace FinanceAdvisor.Infrastructure
             modelBuilder.ApplyConfiguration(new AdvisorConfiguration());
             modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
 
-            
 
-            modelBuilder.Entity<ApplicationUser>().ToTable("ApplicationUsers");
+
+            modelBuilder.Entity<User>().ToTable("Users");
+            modelBuilder.Entity<IdentityRole<Guid>>().ToTable("Roles");
         }
     }
 }

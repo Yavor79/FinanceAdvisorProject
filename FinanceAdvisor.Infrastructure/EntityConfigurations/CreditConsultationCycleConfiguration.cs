@@ -1,5 +1,5 @@
 ﻿using FinanceAdvisor.Domain.Entities;
-using FinanceAdvisor.Infrastructure.Identity;
+//using FinanceAdvisor.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,7 +24,7 @@ public class CreditConsultationCycleConfiguration : IEntityTypeConfiguration<Cre
         //    .OnDelete(DeleteBehavior.Restrict);
 
         builder
-            .HasOne<ApplicationUser>() // Shadow navigation
+            .HasOne<User>() // Shadow navigation
             .WithMany()
             .HasForeignKey(e => e.ClientId)
             .OnDelete(DeleteBehavior.Restrict);

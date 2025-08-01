@@ -1,5 +1,5 @@
 ﻿using FinanceAdvisor.Domain.Entities;
-using FinanceAdvisor.Infrastructure.Identity;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,7 +26,7 @@ public class ConsultationConfiguration : IEntityTypeConfiguration<Consultation>
         //    .HasForeignKey(e => e.ClientId)
         //    .OnDelete(DeleteBehavior.Restrict);
         builder
-            .HasOne<ApplicationUser>() // Shadow nav
+            .HasOne<User>() // Shadow nav
             .WithMany()
             .HasForeignKey(e => e.ClientId)
             .OnDelete(DeleteBehavior.Restrict);

@@ -1,5 +1,5 @@
 ﻿using FinanceAdvisor.Domain.Entities;
-using FinanceAdvisor.Infrastructure.Identity;
+//using FinanceAdvisor.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -21,7 +21,7 @@ public class AdvisorConfiguration : IEntityTypeConfiguration<Advisor>
             .HasDefaultValue(false);
 
         builder
-            .HasOne<ApplicationUser>()
+            .HasOne<User>()
             .WithOne()
             .HasForeignKey<Advisor>(m => m.UserId)
             .OnDelete(DeleteBehavior.Restrict);
