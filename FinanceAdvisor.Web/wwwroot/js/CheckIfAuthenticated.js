@@ -13,6 +13,12 @@
 
 }
 
+function login() {
+
+    window.location.href = "/Account/Login";
+
+}
+
 
 function checkAuth() {
     var xhr = new XMLHttpRequest();
@@ -52,14 +58,23 @@ function checkAuth() {
                     }
                 } else {
                     container.innerHTML = `
-                        <li class="nav-item">
+                        <li id="login" class="nav-item">
                             <a class="btn btn-outline-primary ms-2"
-                               href="https://localhost:7150/Identity/Account/Login?returnUrl=https://localhost:7053/">Login</a>
+                               href="https://localhost:7150/Identity/Account/Login?returnUrl=https://localhost:7053/signin-oidc">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-outline-secondary ms-2"
-                               href="https://localhost:7150/Identity/Account/Register?returnUrl=https://localhost:7053/">Register</a>
+                               href="https://localhost:7150/Identity/Account/Register?returnUrl=https://localhost:7053">Register</a>
                         </li>`;
+                    var btn = document.getElementById("login");
+
+                    if (btn) {
+                        btn.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            login();
+                            
+                        });
+                    }
                 }
             } else {
                 console.error("Auth check failed: HTTP status " + xhr.status);
