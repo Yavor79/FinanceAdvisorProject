@@ -8,8 +8,8 @@ namespace FinanceAdvisor.Infrastructure.Repository
     public class BaseRepository<TType, TId> : IRepository<TType, TId>
         where TType : class
     {
-        private readonly FinanceDbContext dbContext;
-        private readonly DbSet<TType> dbSet;
+        protected readonly FinanceDbContext dbContext;
+        protected readonly DbSet<TType> dbSet;
 
         public BaseRepository(FinanceDbContext dbContext)
         {
