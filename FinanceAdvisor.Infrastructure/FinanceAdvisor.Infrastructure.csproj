@@ -26,4 +26,8 @@
 	<ProjectReference Include="..\FinanceAdvisor.Application\FinanceAdvisor.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Identity\" />
+  </ItemGroup>
+
 </Project>

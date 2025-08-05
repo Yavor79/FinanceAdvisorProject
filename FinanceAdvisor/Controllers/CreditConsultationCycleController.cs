@@ -1,5 +1,6 @@
 ﻿using FinanceAdvisor.Application.DTOs;
 using FinanceAdvisor.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -8,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace FinanceAdvisor.API.Controllers
 {
+    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]                  // All responses are JSON
@@ -66,5 +69,57 @@ namespace FinanceAdvisor.API.Controllers
             var result = await _service.GetAllByManagerIdAsync(managerId);
             return Ok(result);
         }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var cycle = await _service.GetByIdAsync(id);
+            if (cycle == null)
+                return NotFound();
+
+            return Ok(cycle);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCreditConsultationCycleDto dto)
+        {
+            var createdCycle = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = createdCycle.Id }, createdCycle);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateCreditConsultationCycleDto dto)
+        {
+            var updated = await _service.UpdateAsync(dto);
+            if (!updated)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id:guid}/advisor/{advisorId:guid}")]
+        public async Task<IActionResult> DeleteSelf(Guid id, Guid advisorId)
+        {
+            var deleted = await _service.DeleteSelfAsync(id, advisorId);
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpGet("count/advisor/{advisorId:guid}")]
+        public async Task<IActionResult> CountByAdvisor(Guid advisorId)
+        {
+            var count = await _service.CountByAdvisorAsync(advisorId);
+            return Ok(count);
+        }
+
+        [HttpGet("pending")]
+        public async Task<IActionResult> GetPendingCycles()
+        {
+            var pendingCycles = await _service.GetPendingCyclesAsync();
+            return Ok(pendingCycles);
+        }
+
     }
 }

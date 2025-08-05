@@ -1,0 +1,49 @@
+@model IEnumerable<FinanceAdvisor.Web.Models.CreditConsultationCycleViewModel>
+
+<h2>Credit Consultation Cycles</h2>
+
+
+<a href="/Admin/CreditConsultationCycleManagement/Create" class="btn btn-success mb-3">
+    + Create New Credit Cycle
+</a>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Advisor</th>
+            <th>Credit Type</th>
+            <th>Status</th>
+            <th>Meetings</th>
+            <th>Created</th>
+            <th colspan="3">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ClientName</td>
+                <td>@item.AdvisorName</td>
+                <td>@item.CreditType</td>
+                <td>@item.Status</td>
+                <td>@item.MeetingCount</td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+               <td>
+                    <a href="/Admin/CreditConsultationCycleManagement/Edit/@item.Id"
+                       class="btn btn-sm btn-primary">Edit</a>
+                </td>
+                <td>
+                    <form action="/Admin/CreditConsultationCycleManagement/Delete"
+                          method="post"
+                          class="d-inline">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="advisorId" value="@item.AdvisorId" />
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,6 +10,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FinanceAdvisor.Web.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -19,19 +22,51 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Consultations" asp-action="Index">Investment Consultations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Consultations" asp-action="Index">Credit Consultations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="CreditConsultationsCycle" asp-action="Index">Credit Cycles</a>
+                            </li>
+                        }
+                        
+                        
+                        @if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Index">Admin Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="UserManagement" asp-action="Index">User Management</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="AdvisorManagement" asp-action="Index">Advisor Management</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="ConsultationManagement" asp-action="Index">Consultations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="CreditConsultationCycleManagement" asp-action="Index">Credit Cycles</a>
+                            </li>
+
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav" id="auth-buttons">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Consultation" asp-action="Index">Investment Consultations</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Consultation" asp-action="Index">Credit Consultations</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="CreditConsultationsCycle" asp-action="Index">Credit Cycles</a>
+                            <span class="text-muted">Loading...</span>
                         </li>
                     </ul>
+
+
                 </div>
             </div>
         </nav>
@@ -47,9 +82,13 @@
             &copy; 2025 - FinanceAdvisor.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    <script src="~/js/CheckIfAuthenticated.js" asp-append-version="true"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<!-- <a class="btn btn-outline-secondary ms-2"
+    href="https://localhost:7150/Identity/Account/Register?returnUrl=https://localhost:7053/">Register</a> -->

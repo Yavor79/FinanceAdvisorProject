@@ -1,9 +1,12 @@
 ﻿using FinanceAdvisor.Application.DTOs;
 using FinanceAdvisor.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceAdvisor.API.Controllers
 {
+    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]
@@ -53,10 +56,30 @@ namespace FinanceAdvisor.API.Controllers
             return NoContent();
         }
 
+        [HttpPost]
+        [ProducesResponseType(typeof(ApplicationUserDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<bool>> Create([FromBody] ApplicationUserDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var createdUser = await _service.CreateAsync(dto);
+            return createdUser;
+        }
+
+
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             await _service.SoftDeleteAsync(id);
+            return NoContent();
+        }
+
+        [HttpGet("restore/{id:guid}")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            await _service.RestoreAsync(id);
             return NoContent();
         }
     }

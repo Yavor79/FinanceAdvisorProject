@@ -1,0 +1,17 @@
+@model FinanceAdvisor.Web.Models.AdvisorViewModel
+
+<h2>Advisor Details</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">Full Name</dt>
+    <dd class="col-sm-9">@Model.AdvisorId</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.AdvisorId</dd>
+
+    <dt class="col-sm-3">Specialization</dt>
+    <dd class="col-sm-9">@Model.Specialization</dd>
+</dl>
+
+<a asp-action="Index" class="btn btn-secondary">Back</a>
+

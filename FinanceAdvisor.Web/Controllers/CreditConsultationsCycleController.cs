@@ -1,24 +1,26 @@
-﻿using FinanceAdvisor.Web.Models;
+﻿using AutoMapper;
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Web.Controllers;
+using FinanceAdvisor.Web.Helpers;
+using FinanceAdvisor.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
 
-namespace FinanceAdvisor.Web.Controllers
+namespace FinanceAdvisor.Web.Areas.Admin.Controllers
 {
-    public class CreditConsultationsCycleController : BaseController
+    public class CreditConsultationCycleController : BaseController
     {
-        private readonly HttpClient _httpClient;
-        private readonly IMapper _mapper;
+        private readonly ILogger<CreditConsultationCycleController> _logger;
 
-        public CreditConsultationsCycleController(IHttpClientFactory httpClientFactory, IMapper mapper) : base(httpClientFactory)
+        public CreditConsultationCycleController(
+            IHttpClientFactory httpClientFactory,
+            IMapper mapper,
+            ITokenRefreshService tokenService,
+            ILogger<CreditConsultationCycleController> logger)
+            : base(httpClientFactory, mapper, tokenService, logger)
         {
-            _httpClient = httpClientFactory.CreateClient("FinanceAdvisorAPI");
-            _mapper = mapper;
+            _logger = logger;
         }
+
 
         public async Task<IActionResult> Index()
         {
@@ -26,15 +28,11 @@ namespace FinanceAdvisor.Web.Controllers
 
             try
             {
-                var response = await _httpClient.GetAsync("/api/v1/CreditConsultationCycle");
-                if (!response.IsSuccessStatusCode)
-                {
-
-                    // Log error, optionally display a warning or fallback
-                    Console.WriteLine($"API call failed: {response.StatusCode}");
-                    return View("Error", $"API call failed: {response.StatusCode}");
-                    
-                }
+                var response = await _httpClient.GetWithRefreshAsync($"/api/v1/CreditConsultationCycle/client/{clientId}", _tokenService);
+                Console.WriteLine("1 ***************************");
+                var checkResult = await RunChecks(response);
+                if (checkResult != null)
+                    return checkResult;
 
                 var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<CreditConsultationCycleDto>>();
 
@@ -43,28 +41,92 @@ namespace FinanceAdvisor.Web.Controllers
                     ? _mapper.Map<IEnumerable<CreditConsultationCycleViewModel>>(dtos)
                     : new List<CreditConsultationCycleViewModel>();
             }
-            catch
+            catch (Exception ex)
             {
                 // Handle unreachable API, timeout, etc.
                 Console.WriteLine("Unable to load consultation cycles.");
+                Console.WriteLine(ex);
                 return View("Error", "Unable to load consultation cycles.");
             }
 
             return View(viewModels);
         }
 
-        private static IEnumerable<CreditConsultationCycleViewModel> MapToViewModels(IEnumerable<CreditConsultationCycleDto> dtos)
+        public async Task<IActionResult> Details(Guid id)
         {
-            return dtos.Select(dto => new CreditConsultationCycleViewModel
-            {
-                Id = dto.Id,
-                ClientId = dto.ClientId,
-                AdvisorId = dto.AdvisorId,
-                CreditType = dto.CreditType.ToString(),
-                Status = dto.Status.ToString(),
-                MeetingCount = dto.MeetingCount,
-                CreatedAt = dto.CreatedAt
-            });
+            var response = await _httpClient.GetWithRefreshAsync($"/api/v1/CreditConsultationCycle/{id}", _tokenService);
+            var checkResult = await RunChecks(response);
+            if (checkResult != null)
+                return checkResult;
+
+            var dto = await response.Content.ReadFromJsonAsync<CreditConsultationCycleDto>();
+            var viewModel = _mapper.Map<CreditConsultationCycleViewModel>(dto);
+
+            return View(viewModel);
         }
+
+       
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View(new CreateCreditConsultationCycleViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateCreditConsultationCycleViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var dto = _mapper.Map<CreateCreditConsultationCycleDto>(model);
+            var response = await _httpClient.PostAsJsonWithRefreshAsync("/api/v1/CreditConsultationCycle", dto, _tokenService);
+            var checkResult = await RunChecks(response);
+            if (checkResult != null)
+                return checkResult;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var response = await _httpClient.GetWithRefreshAsync($"/api/v1/CreditConsultationCycle/{id}", _tokenService);
+            var checkResult = await RunChecks(response);
+            if (checkResult != null)
+                return checkResult;
+
+            var dto = await response.Content.ReadFromJsonAsync<CreditConsultationCycleDto>();
+            var viewModel = _mapper.Map<UpdateCreditConsultationCycleViewModel>(dto);
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(UpdateCreditConsultationCycleViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var dto = _mapper.Map<UpdateCreditConsultationCycleDto>(model);
+            var response = await _httpClient.PutAsJsonWithRefreshAsync("/api/v1/CreditConsultationCycle", dto, _tokenService);
+            var checkResult = await RunChecks(response);
+            if (checkResult != null)
+                return checkResult;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(Guid id, Guid advisorId)
+        {
+            var response = await _httpClient.DeleteWithRefreshAsync($"/api/v1/CreditConsultationCycle/{id}/advisor/{advisorId}", _tokenService);
+            var checkResult = await RunChecks(response);
+            if (checkResult != null)
+                return checkResult;
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +14,9 @@ using FinanceAdvisor.Infrastructure.Extensions;
 
 using Microsoft.EntityFrameworkCore.Internal;
 using FinanceAdvisor.Infrastructure.Seed.Seeders;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using FinanceAdvisor.Infrastructure.Seed;
 
 
 
@@ -39,14 +42,7 @@ namespace FinanceAdvisor
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
           
 
-            builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
-            {
-                ConfigureIdentity(builder, options);
-            })
-            .AddEntityFrameworkStores<FinanceDbContext>()
-            .AddRoles<IdentityRole<Guid>>()
-            .AddSignInManager<SignInManager<User>>()
-            .AddUserManager<UserManager<User>>();
+            // no Identity here -> users log in the Identity Server !!!
 
             builder.Services.AddCors(options =>
             {
@@ -58,8 +54,48 @@ namespace FinanceAdvisor
                 });
             });
 
+
+            builder.Services.AddAuthentication("Bearer")
+
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.Authority = "https://localhost:7150"; // IdentityServer
+                options.Audience = "finance_api";
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        Console.WriteLine($"Authentication failed: {ctx.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = ctx =>
+                    {
+                        Console.WriteLine("Token validated successfully");
+                        return Task.CompletedTask;
+                    }
+                };
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true, 
+                    ValidateIssuerSigningKey = true,
+
+                    NameClaimType = "name",
+                    RoleClaimType = "role"
+                };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy =>
+                     policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin"));
+            });
+
+
             builder.Services.RegisterRepositories(typeof(CreditConsultationCycleRepository).Assembly);
             builder.Services.RegisterServices(typeof(CreditConsultationCycleService).Assembly);
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -93,12 +129,7 @@ namespace FinanceAdvisor
 
 
             app.UseCors("AllowMVC");
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var services = scope.ServiceProvider;
-            //    await DbSeeder.SeedDataAsync(services);
-            //}
-
+            
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -109,38 +140,15 @@ namespace FinanceAdvisor
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            
+
             app.MapControllers();
+
 
             app.Run();
         }
 
-        private static void ConfigureIdentity(WebApplicationBuilder webAppBuilder, IdentityOptions identityOptions)
-        {
-            identityOptions.Password.RequireDigit =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:Password:RequireDigits");
-            identityOptions.Password.RequireLowercase =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:Password:RequireLowercase");
-            identityOptions.Password.RequireUppercase =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:Password:RequireUppercase");
-            identityOptions.Password.RequireNonAlphanumeric =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:Password:RequireNonAlphanumerical");
-            identityOptions.Password.RequiredLength =
-                webAppBuilder.Configuration.GetValue<int>("Identity:Password:RequiredLength");
-            identityOptions.Password.RequiredUniqueChars =
-                webAppBuilder.Configuration.GetValue<int>("Identity:Password:RequiredUniqueCharacters");
-
-            identityOptions.SignIn.RequireConfirmedAccount =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedAccount");
-            identityOptions.SignIn.RequireConfirmedEmail =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedEmail");
-            identityOptions.SignIn.RequireConfirmedPhoneNumber =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedPhoneNumber");
-
-            identityOptions.User.RequireUniqueEmail =
-                webAppBuilder.Configuration.GetValue<bool>("Identity:User:RequireUniqueEmail");
-        }
     }
 }

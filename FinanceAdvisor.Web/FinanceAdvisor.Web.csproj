@@ -7,16 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\NewFolder\" />
+    <Folder Include="Areas\Advisor\Controllers\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="IdentityModel" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.13.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FinanceAdvisor.Application\FinanceAdvisor.Application.csproj" />
+    <ProjectReference Include="..\FinanceAdvisor.Infrastructure\FinanceAdvisor.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

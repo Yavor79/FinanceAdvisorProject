@@ -107,5 +107,15 @@ namespace FinanceAdvisor.Application.Services
             await _repo.UpdateAsync(advisor);
             
         }
+
+        public async Task<bool> RestoreAsync(Guid id)
+        {
+            var user = await _repo.GetByIdAsync(id);
+            if (user == null || !user.IsDeleted) return false;
+
+            user.IsDeleted = false;
+            await _repo.UpdateAsync(user);
+            return true;
+        }
     }
 }

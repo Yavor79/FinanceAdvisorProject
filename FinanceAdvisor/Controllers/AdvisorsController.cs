@@ -1,10 +1,13 @@
 ﻿using FinanceAdvisor.Application.DTOs;
 using FinanceAdvisor.Application.Interfaces;
 using FinanceAdvisor.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceAdvisor.API.Controllers
 {
+    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]
@@ -68,6 +71,13 @@ namespace FinanceAdvisor.API.Controllers
         public async Task<IActionResult> SoftDelete(Guid id)
         {
             await _service.SoftDeleteAsync(id);
+            return NoContent();
+        }
+
+        [HttpGet("restore/{id:guid}")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            await _service.RestoreAsync(id);
             return NoContent();
         }
     }

@@ -12,5 +12,6 @@ namespace FinanceAdvisor.Application.Interfaces
         Task CreateAsync(AdvisorDto dto);
         Task UpdateAsync(Guid advisorId, AdvisorDto dto);
         Task SoftDeleteAsync(Guid advisorId);
+        Task<bool> RestoreAsync(Guid id);
     }
 }

@@ -1,0 +1,76 @@
+@model IEnumerable<FinanceAdvisor.Web.Models.ApplicationUserViewModel>
+@{
+    ViewData["Title"] = "Application Users";
+}
+
+<h2>Application Users</h2>
+
+<a href="/Admin/UserManagement/Create" class="btn btn-success mb-3">
+    + Create New Application User
+</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            
+            <th>UserName</th>
+            
+
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                
+                
+                <td>@user.Email</td>
+
+                <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+
+                <td>
+                    <a href="/Admin/UserManagement/Edit/@user.Id"
+                       class="btn btn-sm btn-primary">Edit</a>
+                </td>
+                @if (!user.IsDeleted)
+                {
+                    <td>
+                        <form action="/Admin/UserManagement/Delete"
+                              method="post"
+                              class="d-inline">
+                            <input type="hidden" name="id" value="@user.Id" />
+
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
+
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <form action="/Admin/UserManagement/Restore"
+                              method="post"
+                              class="d-inline">
+                            <input type="hidden" name="id" value="@user.Id" />
+
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Restore</button>
+                        </form>
+
+                    </td>
+                }
+                
+                <td>
+                    <form method="post" action="/Admin/UserManagement/UpdateRole">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <select name="role" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Roles>()">
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-secondary mt-1">Change</button>
+                    </form>
+                </td>
+
+            </tr>
+
+        }
+    </tbody>
+</table>

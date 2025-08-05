@@ -1,0 +1,54 @@
+﻿@model FinanceAdvisor.Web.Models.UpdateConsultationViewModel
+
+@{
+    ViewData["Title"] = "Update Consultation";
+}
+
+<h2>Update Consultation</h2>
+
+<form asp-action="Update" asp-controller="ConsultationManagement" asp-area="Admin" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="AdvisorId" class="form-label">Advisor ID</label>
+        <input asp-for="AdvisorId" class="form-control"
+               value="@Model.AdvisorId" />
+        <span asp-validation-for="AdvisorId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ClientId" class="form-label">Client ID</label>
+        <input asp-for="ClientId" class="form-control"
+               value="@Model.ClientId" />
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ScheduledAt" class="form-label">Scheduled Date & Time</label>
+        <input asp-for="ScheduledAt" type="datetime-local" class="form-control"
+               value="@Model.ScheduledAt.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="ScheduledAt" class="text-danger"></span>
+    </div>
+
+    @using FinanceAdvisor.Domain.Enums
+
+    <div class="mb-3">
+        <label asp-for="ConsultationType" class="form-label">Consultation Type</label>
+        <select asp-for="ConsultationType" class="form-control" asp-items="Html.GetEnumSelectList<ConsultationType>()"></select>
+        <span asp-validation-for="ConsultationType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label">Status</label>
+        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<Status>()"></select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a href="/Admin/ConsultationManagement" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

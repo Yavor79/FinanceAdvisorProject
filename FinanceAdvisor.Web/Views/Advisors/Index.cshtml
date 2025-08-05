@@ -1,0 +1,30 @@
+﻿@model IEnumerable<FinanceAdvisor.Web.Models.AdvisorViewModel>
+@{
+    ViewData["Title"] = "Advisors";
+}
+
+<h2>Advisors</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>User</th>
+            <th>Specialization</th>
+            <th>Created At</th>
+            <th>Is Deleted</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var advisor in Model)
+        {
+            <tr>
+                <td>@advisor.AdvisorId</td>
+                <td>@advisor.UserId</td>
+                <td>@advisor.Specialization</td>
+                <td>@advisor.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>@advisor.IsDeleted</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,6 +1,7 @@
 ﻿using FinanceAdvisor.Application.DTOs;
 using FinanceAdvisor.Application.Interfaces;
 using FinanceAdvisor.Application.IRepos;
+using FinanceAdvisor.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceAdvisor.Application.Services
@@ -8,6 +9,7 @@ namespace FinanceAdvisor.Application.Services
     public class ApplicationUserService : IApplicationUserService
     {
         private readonly IApplicationUserRepository _repo;
+        
 
         public ApplicationUserService(IApplicationUserRepository repo)
         {
@@ -16,29 +18,37 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<IEnumerable<ApplicationUserDto>> GetAllAsync()
         {
-            return await _repo.GetAllAttached()
-                .Where(u => !u.IsDeleted)
-                .Select(u => new ApplicationUserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    CreatedAt = u.CreatedAt,
-                    IsDeleted = u.IsDeleted
-                }).ToListAsync();
+            //var users = await _repo.GetFilteredAsync(u => !u.IsDeleted);
+            // In Application Layer:
+            var allUsers = await _repo.GetAllAsync();
+            var filtered = allUsers.Where(u => !u.IsDeleted).ToList();
+
+
+            return filtered.Select(u => new ApplicationUserDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                CreatedAt = u.CreatedAt,
+                IsDeleted = u.IsDeleted
+            });
         }
+
 
         public async Task<IEnumerable<ApplicationUserDto>> GetAllDeletedAsync()
         {
-            return await _repo.GetAllAttached()
-                .Where(u => u.IsDeleted)
-                .Select(u => new ApplicationUserDto
-                {
-                    Id = u.Id,
-                    Email = u.Email,
-                    
-                    CreatedAt = u.CreatedAt,
-                    IsDeleted = u.IsDeleted
-                }).ToListAsync();
+            var allUsers = await _repo.GetAllAsync();
+            var filtered = allUsers.Where(u => u.IsDeleted).ToList();
+
+
+            return filtered.Select(u => new ApplicationUserDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+
+                CreatedAt = u.CreatedAt,
+                IsDeleted = u.IsDeleted
+            });
+
         }
 
         public async Task<ApplicationUserDto?> GetByIdAsync(Guid id)
@@ -74,5 +84,47 @@ namespace FinanceAdvisor.Application.Services
             await _repo.UpdateAsync(user);
             
         }
+
+        public async Task<bool> RestoreAsync(Guid id)
+        {
+            var user = await _repo.GetByIdAsync(id);
+            if (user == null || !user.IsDeleted) return false;
+
+            user.IsDeleted = false;
+            await _repo.UpdateAsync(user);
+            return true;
+        }
+
+        public async Task<bool> CreateAsync(ApplicationUserDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
+                throw new ArgumentException("Invalid user data");
+
+            var newUser = new Domain.Entities.ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                Email = dto.Email,
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            
+            return await _repo.AddAsync(newUser);
+        }
+
+        
+        //public async Task<IEnumerable<ApplicationUserDto>> SearchByEmailAsync(string keyword)
+        //{
+        //    return await _repo.GetAllAttached()
+        //        .Where(u => !u.IsDeleted && u.Email.Contains(keyword))
+        //        .Select(u => new ApplicationUserDto
+        //        {
+        //            Id = u.Id,
+        //            Email = u.Email,
+        //            CreatedAt = u.CreatedAt,
+        //            IsDeleted = u.IsDeleted
+        //        }).ToListAsync();
+        //}
+
     }
 }

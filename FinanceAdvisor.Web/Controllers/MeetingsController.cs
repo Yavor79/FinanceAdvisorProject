@@ -4,26 +4,34 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net.Http.Json;
 using AutoMapper;
+using FinanceAdvisor.Web.Helpers;
 
 namespace FinanceAdvisor.Web.Controllers
 {
     public class MeetingsController : BaseController
     {
-        private readonly HttpClient _httpClient;
-        private readonly IMapper _mapper;
+        private readonly ILogger<CreditConsultationsCycleController> _logger;
 
-        public MeetingsController(IHttpClientFactory httpClientFactory, IMapper mapper)
-            : base(httpClientFactory)
+        public MeetingsController(
+            IHttpClientFactory httpClientFactory,
+            IMapper mapper,
+            ITokenRefreshService tokenService,
+            ILogger<CreditConsultationsCycleController> logger)
+            : base(httpClientFactory, mapper, tokenService, logger)
         {
-            _httpClient = httpClientFactory.CreateClient("FinanceAdvisorAPI");
-            _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
             try
             {
-                var response = await _httpClient.GetAsync("/api/v1/Meetings");
+                var response = await _httpClient.GetWithRefreshAsync("/api/v1/Meetings", _tokenService);
+
+                var checkResult = await RunChecks(response);
+                if (checkResult != null)
+                    return checkResult;
+
                 if (!response.IsSuccessStatusCode)
                     return View("Error", $"API Error: {response.StatusCode}");
 

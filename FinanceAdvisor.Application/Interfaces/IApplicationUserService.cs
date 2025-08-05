@@ -9,5 +9,8 @@ namespace FinanceAdvisor.Application.Interfaces
         Task<IEnumerable<ApplicationUserDto>> GetAllDeletedAsync();
         Task UpdateAsync(Guid id, ApplicationUserDto dto);
         Task SoftDeleteAsync(Guid id);
+
+        Task<bool> RestoreAsync(Guid id);
+        Task<bool> CreateAsync(ApplicationUserDto dto);
     }
 }

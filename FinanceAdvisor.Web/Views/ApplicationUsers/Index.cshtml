@@ -1,0 +1,30 @@
+﻿@model IEnumerable<FinanceAdvisor.Web.Models.ApplicationUserViewModel>
+@{
+    ViewData["Title"] = "Application Users";
+}
+
+<h2>Application Users</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>UserName</th>
+            <th>Email</th>
+            
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                
+                <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>
