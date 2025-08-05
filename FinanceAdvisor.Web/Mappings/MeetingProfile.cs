@@ -9,6 +9,11 @@ namespace FinanceAdvisor.Web.Mappings
         public MeetingProfile()
         {
             CreateMap<MeetingDto, MeetingViewModel>();
+            CreateMap<MeetingViewModel, MeetingDto>();
+            CreateMap<CreateMeetingViewModel, CreateMeetingDto>();
+            CreateMap<CreateMeetingDto, CreateMeetingViewModel>();
+            CreateMap<UpdateMeetingViewModel, UpdateMeetingDto>();
+            CreateMap<UpdateMeetingDto, UpdateMeetingViewModel>();
         }
     }
 }

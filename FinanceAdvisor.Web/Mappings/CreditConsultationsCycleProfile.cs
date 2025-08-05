@@ -8,7 +8,19 @@ namespace FinanceAdvisor.Web.Mappings
     {
         public CreditConsultationsCycleProfile()
         {
+            // View / display
             CreateMap<CreditConsultationCycleDto, CreditConsultationCycleViewModel>();
+            CreateMap<CreditConsultationCycleViewModel, CreditConsultationCycleDto>();
+
+            // Create
+            CreateMap<CreateCreditConsultationCycleViewModel, CreateCreditConsultationCycleDto>();
+            CreateMap<CreateCreditConsultationCycleDto, CreateCreditConsultationCycleViewModel>();
+
+            // Update
+            CreateMap<UpdateCreditConsultationCycleViewModel, UpdateCreditConsultationCycleDto>();
+            CreateMap<UpdateCreditConsultationCycleDto, CreditConsultationCycleViewModel>();
+            CreateMap<CreditConsultationCycleDto, UpdateCreditConsultationCycleViewModel>();
+            CreateMap<UpdateCreditConsultationCycleViewModel, CreditConsultationCycleDto>();
         }
     }
 }

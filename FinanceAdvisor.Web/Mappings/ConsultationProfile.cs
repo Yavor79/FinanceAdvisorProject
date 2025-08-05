@@ -9,6 +9,11 @@ namespace FinanceAdvisor.Web.Mappings
         public ConsultationProfile()
         {
             CreateMap<ConsultationDto, ConsultationViewModel>();
+            CreateMap<ConsultationDto, UpdateConsultationViewModel>();
+            CreateMap<UpdateConsultationViewModel, UpdateConsultationDto>();
+            CreateMap<CreateConsultationViewModel, ConsultationDto>();
+            CreateMap<CreateConsultationViewModel, CreateConsultationDto>();
+
         }
     }
 }
