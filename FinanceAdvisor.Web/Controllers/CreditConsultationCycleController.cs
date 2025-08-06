@@ -40,27 +40,37 @@ namespace FinanceAdvisor.Web.Controllers
                 if (isClient)
                 {
                     response = await _httpClient.GetWithRefreshAsync($"/api/v1/CreditConsultationCycle/client/{clientId}", _tokenService);
+                    var checkResult = await RunChecks(response);
+                    if (checkResult != null)
+                        return checkResult;
+
+                    var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<CreditConsultationCycleDto>>();
+
+                    // Map to ViewModels
+                    viewModels = dtos != null
+                        ? _mapper.Map<IEnumerable<CreditConsultationCycleViewModel>>(dtos)
+                        : new List<CreditConsultationCycleViewModel>();
+                    return View(viewModels);
                 }
-                else if (isAdvisor)
+                if (isAdvisor)
                 {
                     response = await _httpClient.GetWithRefreshAsync($"/api/v1/CreditConsultationCycle/advisor/{advisorId}", _tokenService);
+                    var checkResult = await RunChecks(response);
+                    if (checkResult != null)
+                        return checkResult;
+
+                    var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<CreditConsultationCycleDto>>();
+
+                    // Map to ViewModels
+                    viewModels = dtos != null
+                        ? _mapper.Map<IEnumerable<CreditConsultationCycleViewModel>>(dtos)
+                        : new List<CreditConsultationCycleViewModel>();
+                    return View(viewModels);
                 }
-                else
-                {
-                    return View("Error", "Unauthorized or missing user identifiers.");
-                }
 
-                Console.WriteLine("1 ***************************");
-                var checkResult = await RunChecks(response);
-                if (checkResult != null)
-                    return checkResult;
+                IEnumerable<CreditConsultationCycleViewModel> e = new List<CreditConsultationCycleViewModel>();
+                return View(e);
 
-                var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<CreditConsultationCycleDto>>();
-
-                // Map to ViewModels
-                viewModels = dtos != null
-                    ? _mapper.Map<IEnumerable<CreditConsultationCycleViewModel>>(dtos)
-                    : new List<CreditConsultationCycleViewModel>();
             }
             catch (Exception ex)
             {
@@ -70,7 +80,7 @@ namespace FinanceAdvisor.Web.Controllers
                 return View("Error", "Unable to load consultation cycles.");
             }
 
-            return View(viewModels);
+            
         }
 
         public async Task<IActionResult> Details(Guid id)

@@ -7,6 +7,7 @@ using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace FinanceAdvisor.Web.Controllers
 {
@@ -67,32 +68,46 @@ namespace FinanceAdvisor.Web.Controllers
                         : $"/api/v1/Consultations/advisor/{advisorId}/{filter}";
 
                     response = await _httpClient.GetWithRefreshAsync(endpoint, _tokenService);
+                    var checkResult = await RunChecks(response);
+                    if (checkResult != null)
+                        return checkResult;
+
+                    if (!response.IsSuccessStatusCode)
+                        return View("Error", $"API Error: {response.StatusCode}");
+
+                    var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ConsultationDto>>();
+                    var viewModels = _mapper.Map<IEnumerable<ConsultationViewModel>>(dtos);
+
+                    ViewBag.Filter = filter;
+                    return View(viewModels);
                 }
-                else if (isClient && clientId != Guid.Empty)
+                if (isClient && clientId != Guid.Empty)
                 {
                     var endpoint = string.IsNullOrWhiteSpace(filter)
                         ? $"/api/v1/Consultations/client/{clientId}"
                         : $"/api/v1/Consultations/client/{clientId}/{filter}";
 
                     response = await _httpClient.GetWithRefreshAsync(endpoint, _tokenService);
+                    var checkResult = await RunChecks(response);
+                    if (checkResult != null)
+                        return checkResult;
+
+                    if (!response.IsSuccessStatusCode)
+                        return View("Error", $"API Error: {response.StatusCode}");
+
+                    var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ConsultationDto>>();
+                    var viewModels = _mapper.Map<IEnumerable<ConsultationViewModel>>(dtos);
+
+                    ViewBag.Filter = filter;
+                    return View(viewModels);
                 }
-                else
-                {
-                    return View("Error", "Unauthorized or missing user identifiers.");
-                }
-
-                var checkResult = await RunChecks(response);
-                if (checkResult != null)
-                    return checkResult;
-
-                if (!response.IsSuccessStatusCode)
-                    return View("Error", $"API Error: {response.StatusCode}");
-
-                var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ConsultationDto>>();
-                var viewModels = _mapper.Map<IEnumerable<ConsultationViewModel>>(dtos);
 
                 ViewBag.Filter = filter;
-                return View(viewModels);
+                IEnumerable<ConsultationViewModel> e = new List<ConsultationViewModel>();
+                
+                return View(e);
+
+
             }
             catch (Exception ex)
             {
