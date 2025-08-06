@@ -3,6 +3,7 @@ using FinanceAdvisor.Application.DTOs;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceAdvisor.Web.Controllers
@@ -21,7 +22,7 @@ namespace FinanceAdvisor.Web.Controllers
             _logger = logger;
         }
 
-
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             IEnumerable<CreditConsultationCycleViewModel> viewModels;

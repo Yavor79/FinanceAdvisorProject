@@ -5,6 +5,7 @@ using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceAdvisor.Web.Controllers
@@ -45,7 +46,7 @@ namespace FinanceAdvisor.Web.Controllers
             Console.WriteLine($"=== {context} DTO Logging End ===");
         }
 
-
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string filter)
         {
             try
