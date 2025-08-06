@@ -48,11 +48,7 @@ namespace FinanceAdvisor.Web.Controllers
 
         public IActionResult Privacy()
         {
-            var claims = User.Claims
-            .Select(c => $"{c.Type}: {c.Value}")
-            .ToList();
-
-            return Content(string.Join("\n", claims));
+           
             return View();
         }
 
