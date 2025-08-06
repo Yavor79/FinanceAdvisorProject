@@ -9,8 +9,8 @@ namespace FinanceAdvisor.Application.DTOs
         public Guid Id { get; set; }
         public Guid ClientId { get; set; }
         public Guid AdvisorId { get; set; }
-        public string ClientName { get; set; }
-        public string AdvisorName { get; set; }
+        public string ClientName { get; set; } = string.Empty;
+        public string AdvisorName { get; set; } = string.Empty;
         public CreditType CreditType { get; set; }
         public Status Status { get; set; }
 

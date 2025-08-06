@@ -18,16 +18,19 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<IEnumerable<AdvisorDto>> GetAllAsync()
         {
-            return await _repo.GetAllAttached()
-                .Where(a => !a.IsDeleted)
-                .Select(a => new AdvisorDto
-                {
-                    AdvisorId = a.AdvisorId,
-                    UserId = a.UserId,
-                    Specialization = a.Specialization,
-                    CreatedAt = a.CreatedAt,
-                    IsDeleted = a.IsDeleted
-                }).ToListAsync();
+            var advisors = await _repo.GetAllAttached()
+            .Where(a => !a.IsDeleted)
+            .ToListAsync();
+
+            return advisors.Select(a => new AdvisorDto
+            {
+                AdvisorId = a.AdvisorId,
+                UserId = a.UserId,
+                Specialization = a.Specialization,
+                CreatedAt = a.CreatedAt,
+                IsDeleted = a.IsDeleted
+            });
+
         }
 
         public async Task<AdvisorDto?> GetByIdAsync(Guid id)

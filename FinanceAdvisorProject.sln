@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceAdvisor.Application"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceAdvisor.Identity", "FinanceAdvisor.Identity\FinanceAdvisor.Identity.csproj", "{D57EB50E-DC30-4FB4-B999-1CE6152831F9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceAdvisor.Tests", "FinanceAdvisor.Tests\FinanceAdvisor.Tests.csproj", "{5A840C5D-033C-425C-9C25-D3D3A3BF0055}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{D57EB50E-DC30-4FB4-B999-1CE6152831F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D57EB50E-DC30-4FB4-B999-1CE6152831F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D57EB50E-DC30-4FB4-B999-1CE6152831F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A840C5D-033C-425C-9C25-D3D3A3BF0055}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A840C5D-033C-425C-9C25-D3D3A3BF0055}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A840C5D-033C-425C-9C25-D3D3A3BF0055}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A840C5D-033C-425C-9C25-D3D3A3BF0055}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
