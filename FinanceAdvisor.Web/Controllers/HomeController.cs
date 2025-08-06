@@ -12,13 +12,13 @@ namespace FinanceAdvisor.Web.Controllers
     [AllowAnonymous]
     public class HomeController : BaseController
     {
-        private readonly ILogger<CreditConsultationsCycleController> _logger;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(
             IHttpClientFactory httpClientFactory,
             IMapper mapper,
             ITokenRefreshService tokenService,
-            ILogger<CreditConsultationsCycleController> logger)
+            ILogger<HomeController> logger)
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;
@@ -27,22 +27,12 @@ namespace FinanceAdvisor.Web.Controllers
 
         public IActionResult Index()
         {
-            //Debug();
-            //var claims = User.Claims
-            //.Select(c => $"{c.Type}: {c.Value}")
-            //.ToList();
 
-            //return Content(string.Join("\n", claims));
-            //var roles = User.Claims
-            //.Where(c => c.Type == "role")
-            //.Select(c => $"{c.Type} = {c.Value}");
-
-            //return Content("Roles:\n" + string.Join("\n", roles));
             if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin"))
             {
                 Console.WriteLine("***/////////////////////////Admin");
             }
-            else if(User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Advisor"))
+            else if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Advisor"))
             {
                 Console.WriteLine("---------/////////////////////////ADvisor");
             }
@@ -76,9 +66,21 @@ namespace FinanceAdvisor.Web.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? statusCode)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            switch (statusCode)
+            {
+                case 401:
+                    return this.View("Error401");
+                case 403:
+                    return this.View("UnauthorizedError");
+                case 404:
+                    return this.View("NotFoundError");
+                case 500:
+                    return this.View("Error500");
+                default:
+                    return this.View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
         }
     }
 }

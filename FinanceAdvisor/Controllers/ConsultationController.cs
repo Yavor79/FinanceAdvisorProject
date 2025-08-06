@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceAdvisor.API.Controllers
 {
     [Authorize]
-    [Authorize(Policy = "AdminOnly")]
+    //[Authorize(Policy = "AdminOnly")]
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]
@@ -29,17 +29,17 @@ namespace FinanceAdvisor.API.Controllers
             return Ok(consultations);
         }
 
-        [HttpGet("advisor/{advisorId:guid}")]
-        public async Task<ActionResult<IEnumerable<ConsultationDto>>> GetByAdvisorId(Guid advisorId)
+        [HttpGet("advisor/{advisorId:guid}/{consultationType}")]
+        public async Task<ActionResult<IEnumerable<ConsultationDto>>> GetByAdvisorId(Guid advisorId, string? consultationType)
         {
-            var consultations = await _service.GetAllByAdvisorIdAsync(advisorId);
+            var consultations = await _service.GetAllByAdvisorIdAsync(advisorId, consultationType);
             return Ok(consultations);
         }
 
-        [HttpGet("client/{clientId:guid}")]
-        public async Task<ActionResult<IEnumerable<ConsultationDto>>> GetByClientId(Guid clientId)
+        [HttpGet("client/{clientId:guid}/{consultationType}")]
+        public async Task<ActionResult<IEnumerable<ConsultationDto>>> GetByClientId(Guid clientId, string? consultationType)
         {
-            var consultations = await _service.GetAllByClientIdAsync(clientId);
+            var consultations = await _service.GetAllByClientIdAsync(clientId, consultationType);
             return Ok(consultations);
         }
 
@@ -47,7 +47,7 @@ namespace FinanceAdvisor.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateConsultationDto dto)
         {
             var createdConsultation = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = createdConsultation.ConsultationId }, createdConsultation);
+            return NoContent();
         }
 
         [HttpPut]

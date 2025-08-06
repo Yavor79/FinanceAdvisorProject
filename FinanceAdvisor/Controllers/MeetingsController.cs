@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceAdvisor.API.Controllers
 {
     [Authorize]
-    [Authorize(Policy = "AdminOnly")]
+    //[Authorize(Policy = "AdminOnly")]
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]

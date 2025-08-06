@@ -9,13 +9,13 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
 {
     public class CreditConsultationCycleManagementController : BaseAdminController
     {
-        private readonly ILogger<CreditConsultationsCycleController> _logger;
+        private readonly ILogger<CreditConsultationCycleManagementController> _logger;
 
         public CreditConsultationCycleManagementController(
             IHttpClientFactory httpClientFactory,
             IMapper mapper,
             ITokenRefreshService tokenService,
-            ILogger<CreditConsultationsCycleController> logger)
+            ILogger<CreditConsultationCycleManagementController> logger)
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;

@@ -156,7 +156,7 @@ namespace FinanceAdvisor.Application.Services
             return cycle;
         }
 
-        public async Task<CreditConsultationCycleDto> CreateAsync(CreateCreditConsultationCycleDto dto)
+        public async Task<bool> CreateAsync(CreateCreditConsultationCycleDto dto)
         {
             var newCycle = new Domain.Entities.CreditConsultationCycle
             {
@@ -170,17 +170,17 @@ namespace FinanceAdvisor.Application.Services
 
             await _repository.AddAsync(newCycle);
 
-            var cycle = await SetClientAndAdvisorNameInDTO(new CreditConsultationCycleDto
-            {
-                Id = newCycle.Id,
-                ClientId = newCycle.ClientId,
-                AdvisorId = newCycle.AdvisorId,
-                CreditType = newCycle.CreditType,
-                Status = newCycle.Status,
-                MeetingCount = 0,
-                CreatedAt = newCycle.CreatedAt
-            });
-            return cycle;
+            //var cycle = await SetClientAndAdvisorNameInDTO(new CreditConsultationCycleDto
+            //{
+            //    Id = newCycle.Id,
+            //    ClientId = newCycle.ClientId,
+            //    AdvisorId = newCycle.AdvisorId,
+            //    CreditType = newCycle.CreditType,
+            //    Status = newCycle.Status,
+            //    MeetingCount = 0,
+            //    CreatedAt = newCycle.CreatedAt
+            //});
+            return true;
 
         }
 

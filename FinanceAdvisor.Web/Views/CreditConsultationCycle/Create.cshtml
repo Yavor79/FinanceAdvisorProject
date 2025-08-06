@@ -1,0 +1,57 @@
+﻿@model FinanceAdvisor.Web.Models.CreateCreditConsultationCycleViewModel;
+
+@{
+    ViewData["Title"] = "Create Credit Cycle";
+
+    var isUser = User.Claims.Any(c =>
+        c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+        c.Value == "User");
+
+    var isAdvisor = User.Claims.Any(c =>
+        c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+        c.Value == "Advisor");
+
+    var clientId = User.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
+    var advisorId = User.Claims.FirstOrDefault(c => c.Type == "advisor_id")?.Value;
+}
+
+<h2>Create Credit Consultation Cycle</h2>
+
+<form asp-action="Create" method="post">
+
+    @if (isUser)
+    {
+        <input type="hidden" asp-for="ClientId" value="@clientId" />
+        <div class="form-group mb-3">
+            <label asp-for="AdvisorId" class="form-label"></label>
+            <input asp-for="AdvisorId" class="form-control" />
+            <span asp-validation-for="AdvisorId" class="text-danger"></span>
+        </div>
+    }
+    else if (isAdvisor)
+    {
+        <input type="hidden" asp-for="AdvisorId" value="@advisorId" />
+        <div class="form-group mb-3">
+            <label asp-for="ClientId" class="form-label"></label>
+            <input asp-for="ClientId" class="form-control" />
+            <span asp-validation-for="ClientId" class="text-danger"></span>
+        </div>
+    }
+
+    <div class="form-group mb-3">
+        <label asp-for="CreditType" class="form-label"></label>
+        <select asp-for="CreditType" class="form-select" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.CreditType>()">
+            <option value="">-- Select Credit Type --</option>
+        </select>
+        <span asp-validation-for="CreditType" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

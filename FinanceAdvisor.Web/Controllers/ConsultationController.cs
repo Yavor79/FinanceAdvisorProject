@@ -1,22 +1,24 @@
 ﻿using AutoMapper;
+using Azure;
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceAdvisor.Web.Areas.Admin.Controllers
+namespace FinanceAdvisor.Web.Controllers
 {
 
     public class ConsultationController : BaseController
     {
-        private readonly ILogger<CreditConsultationCycleController> _logger;
+        private readonly ILogger<ConsultationController> _logger;
 
         public ConsultationController(
             IHttpClientFactory httpClientFactory,
             IMapper mapper,
             ITokenRefreshService tokenService,
-            ILogger<CreditConsultationCycleController> logger)
+            ILogger<ConsultationController> logger)
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;
@@ -26,7 +28,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             Console.WriteLine("=== CreateConsultationViewModel Log ===");
             Console.WriteLine($"ClientId: {vm.ClientId}");
             Console.WriteLine($"AdvisorId: {vm.AdvisorId}");
-            Console.WriteLine($"ScheduledAt: {vm.ScheduledAt}");
+            Console.WriteLine($"ScheduledAt: {vm.ScheduledDateTime}");
             Console.WriteLine($"ConsultationType: {vm.ConsultationType}");
             Console.WriteLine("========================================");
         }
@@ -44,11 +46,39 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
         }
 
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter)
         {
             try
             {
-                var response = await _httpClient.GetWithRefreshAsync($"/api/v1/Consultations/client/{clientId}", _tokenService);
+                HttpResponseMessage response;
+
+                // Determine role
+                var isAdvisor = User.Claims.Any(c =>
+                    c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Advisor");
+
+                var isClient = User.Claims.Any(c =>
+                    c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User");
+
+                if (isAdvisor && advisorId != Guid.Empty)
+                {
+                    var endpoint = string.IsNullOrWhiteSpace(filter)
+                        ? $"/api/v1/Consultations/advisor/{advisorId}"
+                        : $"/api/v1/Consultations/advisor/{advisorId}/{filter}";
+
+                    response = await _httpClient.GetWithRefreshAsync(endpoint, _tokenService);
+                }
+                else if (isClient && clientId != Guid.Empty)
+                {
+                    var endpoint = string.IsNullOrWhiteSpace(filter)
+                        ? $"/api/v1/Consultations/client/{clientId}"
+                        : $"/api/v1/Consultations/client/{clientId}/{filter}";
+
+                    response = await _httpClient.GetWithRefreshAsync(endpoint, _tokenService);
+                }
+                else
+                {
+                    return View("Error", "Unauthorized or missing user identifiers.");
+                }
 
                 var checkResult = await RunChecks(response);
                 if (checkResult != null)
@@ -60,10 +90,12 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
                 var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ConsultationDto>>();
                 var viewModels = _mapper.Map<IEnumerable<ConsultationViewModel>>(dtos);
 
+                ViewBag.Filter = filter;
                 return View(viewModels);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to load consultations.");
                 return View("Error", "Unable to load consultations.");
             }
         }
@@ -84,14 +116,20 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(ConsultationType filter)
         {
-            return View(new CreateConsultationViewModel());
+            var model = new CreateConsultationViewModel();
+
+            model.ConsultationType = filter;
+            Console.WriteLine("//////////////"+filter.ToString());
+
+            return View(model);
         }
 
 
+
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("ClientId,AdvisorId,ScheduledAt,ConsultationType")] CreateConsultationViewModel model)
+        public async Task<IActionResult> Create([Bind("ClientId,AdvisorId,ScheduledDateTime,ConsultationType")] CreateConsultationViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -107,7 +145,15 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             if (!response.IsSuccessStatusCode)
                 return View("Error", $"API Error: {response.StatusCode}");
 
-            return RedirectToAction(nameof(Index));
+            var filter = model.ConsultationType switch
+            {
+                ConsultationType.CreditAdvisory => "Credit",
+                ConsultationType.InvestmentAdvisory => "Investment",
+                ConsultationType.SecurityAdvisory => "Security",
+                _ => null
+            };
+
+            return RedirectToAction(nameof(Index), new { filter });
         }
 
         [HttpGet]
@@ -171,7 +217,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             return View("Count", count);
         }
 
-       
+
     }
 }
 

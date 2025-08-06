@@ -14,7 +14,7 @@ namespace FinanceAdvisor.Web.Models
 
         [Required]
         [DataType(DataType.DateTime)]
-        public DateTime ScheduledAt { get; set; }
+        public DateTime ScheduledDateTime { get; set; }
 
         [Required]
         public ConsultationType ConsultationType { get; set; }

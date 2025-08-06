@@ -1,0 +1,48 @@
+﻿@model FinanceAdvisor.Web.Models.CreditConsultationCycleViewModel
+
+@{
+    ViewData["Title"] = "Credit Consultation Cycle Details";
+}
+
+<h2>Credit Consultation Cycle Details</h2>
+
+<div class="card p-4 mt-4 shadow-sm">
+    <dl class="row">
+        <dt class="col-sm-3">ID</dt>
+        <dd class="col-sm-9">@Model.Id</dd>
+
+        <dt class="col-sm-3">Client ID</dt>
+        <dd class="col-sm-9">@Model.ClientId</dd>
+
+        <dt class="col-sm-3">Client Name</dt>
+        <dd class="col-sm-9">@Model.ClientName</dd>
+
+        <dt class="col-sm-3">Advisor ID</dt>
+        <dd class="col-sm-9">@Model.AdvisorId</dd>
+
+        <dt class="col-sm-3">Advisor Name</dt>
+        <dd class="col-sm-9">@Model.AdvisorName</dd>
+
+        <dt class="col-sm-3">Credit Type</dt>
+        <dd class="col-sm-9">@Model.CreditType</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+
+        <dt class="col-sm-3">Number of Meetings</dt>
+        <dd class="col-sm-9">@Model.MeetingCount</dd>
+
+        <dt class="col-sm-3">Created At</dt>
+        <dd class="col-sm-9">@Model.CreatedAt.ToString("f")</dd>
+    </dl>
+
+    <div class="mt-4 d-flex gap-2">
+        
+        <!-- View Meetings Button -->
+        <a asp-controller="MeetingManagement" asp-action="ByCycleId" asp-route-cycleId="@Model.Id" class="btn btn-primary">
+            View Meetings
+        </a>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary mt-3">Back to List</a>
+</div>

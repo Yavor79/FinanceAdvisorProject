@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace FinanceAdvisor.API.Controllers
 {
     [Authorize]
-    [Authorize(Policy = "AdminOnly")]
+    //[Authorize(Policy = "AdminOnly")]
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]                  // All responses are JSON
@@ -42,6 +42,7 @@ namespace FinanceAdvisor.API.Controllers
         /// Get all credit consultation cycles for a specific client.
         /// </summary>
         /// <param name="clientId">The GUID of the client.</param>
+        [Authorize(Policy = "UserOnly")]
         [HttpGet("client/{clientId:guid}")]
         [ProducesResponseType(typeof(IEnumerable<CreditConsultationCycleDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -57,16 +58,16 @@ namespace FinanceAdvisor.API.Controllers
         /// <summary>
         /// Get all credit consultation cycles assigned to a manager (advisor).
         /// </summary>
-        /// <param name="managerId">The GUID of the advisor.</param>
-        [HttpGet("manager/{managerId:guid}")]
+        /// <param name="advisorId">The GUID of the advisor.</param>
+        [HttpGet("advisor/{advisorId:guid}")]
         [ProducesResponseType(typeof(IEnumerable<CreditConsultationCycleDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<CreditConsultationCycleDto>>> GetByManagerId(Guid managerId)
+        public async Task<ActionResult<IEnumerable<CreditConsultationCycleDto>>> GetByManagerId(Guid advisorId)
         {
-            if (managerId == Guid.Empty)
+            if (advisorId == Guid.Empty)
                 return BadRequest("Manager ID cannot be empty.");
 
-            var result = await _service.GetAllByManagerIdAsync(managerId);
+            var result = await _service.GetAllByManagerIdAsync(advisorId);
             return Ok(result);
         }
 
@@ -84,7 +85,7 @@ namespace FinanceAdvisor.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateCreditConsultationCycleDto dto)
         {
             var createdCycle = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = createdCycle.Id }, createdCycle);
+            return NoContent();
         }
 
         [HttpPut]

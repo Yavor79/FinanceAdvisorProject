@@ -9,13 +9,13 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
 {
     public class MeetingManagementController : BaseAdminController
     {
-        private readonly ILogger<CreditConsultationsCycleController> _logger;
+        private readonly ILogger<MeetingManagementController> _logger;
 
         public MeetingManagementController(
             IHttpClientFactory httpClientFactory,
             IMapper mapper,
             ITokenRefreshService tokenService,
-            ILogger<CreditConsultationsCycleController> logger)
+            ILogger<MeetingManagementController> logger)
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;

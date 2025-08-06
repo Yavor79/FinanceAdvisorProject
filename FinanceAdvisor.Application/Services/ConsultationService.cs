@@ -2,6 +2,8 @@
 using FinanceAdvisor.Application.Interfaces;
 using FinanceAdvisor.Application.IRepos;
 using Microsoft.EntityFrameworkCore;
+using FinanceAdvisor.Domain.Enums;
+using FinanceAdvisor.Domain.Entities;
 
 
 namespace FinanceAdvisor.Application.Services
@@ -155,35 +157,71 @@ namespace FinanceAdvisor.Application.Services
             return await MapWithUserEmailsAsync(consultations);
         }
 
-        public async Task<IEnumerable<ConsultationDto>> GetAllByAdvisorIdAsync(Guid advisorId)
+        public async Task<IEnumerable<ConsultationDto>> GetAllByAdvisorIdAsync(Guid advisorId, string? consultationType)
         {
             if (advisorId == Guid.Empty)
                 return Enumerable.Empty<ConsultationDto>();
 
-            var consultations = await _repository
-                .GetAllAttached()
-                .Include(c => c.Advisor)
-                .AsNoTracking()
-                .Where(c => c.AdvisorId == advisorId)
-                .ToListAsync();
+            List<Consultation> consultations;
+
+            if (string.IsNullOrWhiteSpace(consultationType))
+            {
+                consultations = await _repository
+                    .GetAllAttached()
+                    .Include(c => c.Advisor)
+                    .AsNoTracking()
+                    .Where(c => c.AdvisorId == advisorId)
+                    .ToListAsync();
+            }
+            else
+            {
+                if (!Enum.TryParse<ConsultationType>(consultationType, ignoreCase: true, out var parsedType))
+                    return Enumerable.Empty<ConsultationDto>(); // invalid consultation type string
+
+                consultations = await _repository
+                    .GetAllAttached()
+                    .Include(c => c.Advisor)
+                    .AsNoTracking()
+                    .Where(c => c.AdvisorId == advisorId && c.ConsultationType == parsedType)
+                    .ToListAsync();
+            }
 
             return await MapWithUserEmailsAsync(consultations);
         }
 
-        public async Task<IEnumerable<ConsultationDto>> GetAllByClientIdAsync(Guid clientId)
+
+        public async Task<IEnumerable<ConsultationDto>> GetAllByClientIdAsync(Guid clientId, string? consultationType)
         {
             if (clientId == Guid.Empty)
                 return Enumerable.Empty<ConsultationDto>();
 
-            var consultations = await _repository
-                .GetAllAttached()
-                .Include(c => c.Advisor)
-                .AsNoTracking()
-                .Where(c => c.ClientId == clientId)
-                .ToListAsync();
+            List<Consultation> consultations;
+
+            if (string.IsNullOrWhiteSpace(consultationType))
+            {
+                consultations = await _repository
+                    .GetAllAttached()
+                    .Include(c => c.Advisor)
+                    .AsNoTracking()
+                    .Where(c => c.ClientId == clientId)
+                    .ToListAsync();
+            }
+            else
+            {
+                if (!Enum.TryParse<ConsultationType>(consultationType, ignoreCase: true, out var parsedType))
+                    return Enumerable.Empty<ConsultationDto>(); // invalid consultation type string
+
+                consultations = await _repository
+                    .GetAllAttached()
+                    .Include(c => c.Advisor)
+                    .AsNoTracking()
+                    .Where(c => c.ClientId == clientId && c.ConsultationType == parsedType)
+                    .ToListAsync();
+            }
 
             return await MapWithUserEmailsAsync(consultations);
         }
+
 
         public async Task<ConsultationDto?> GetByIdAsync(Guid id)
         {

@@ -32,7 +32,7 @@ namespace FinanceAdvisor.Identity
             var result = await _userManager.AddToRoleAsync(user, role);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
-
+            
             return Ok();
         }
 

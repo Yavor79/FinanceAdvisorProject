@@ -79,7 +79,7 @@ namespace FinanceAdvisor.Application.Services
             {
                 AdvisorId = Guid.NewGuid(),
                 UserId = dto.UserId,
-                Specialization = dto.Specialization,
+                Specialization = dto.Specialization != 0 ? dto.Specialization : Specialization.Credit,
                 CreatedAt = DateTime.UtcNow,
                 IsDeleted = false
             };

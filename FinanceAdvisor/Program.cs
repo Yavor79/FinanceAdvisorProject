@@ -89,7 +89,13 @@ namespace FinanceAdvisor
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy("AdminOnly", policy =>
-                     policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin"));
+                    policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin"));
+
+                options.AddPolicy("AdvisorOnly", policy =>
+                    policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Advisor"));
+
+                options.AddPolicy("UserOnly", policy =>
+                    policy.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "User"));
             });
 
 

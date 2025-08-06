@@ -22,42 +22,37 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Consultations" asp-action="Index">Investment Consultations</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Consultations" asp-action="Index">Credit Consultations</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="CreditConsultationsCycle" asp-action="Index">Credit Cycles</a>
-                            </li>
-                        }
                         
                         
-                        @if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Home" asp-action="Index">Admin Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="UserManagement" asp-action="Index">User Management</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="AdvisorManagement" asp-action="Index">Advisor Management</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="ConsultationManagement" asp-action="Index">Consultations</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="CreditConsultationCycleManagement" asp-action="Index">Credit Cycles</a>
-                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="InvestmentAdvisory">
+                                Investment Consultations
+                            </a>
+                        </li>
 
-                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="CreditAdvisory">
+                                Credit Consultations
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="SecurityAdvisory">
+                                Security Consultations
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="CreditConsultationCycle" asp-action="Index">Credit Cycles</a>
+                        </li>
+                        
+                        
+
+                        
                     </ul>
 
                     <ul class="navbar-nav" id="auth-buttons">

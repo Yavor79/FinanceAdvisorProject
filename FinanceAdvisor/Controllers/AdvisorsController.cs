@@ -53,11 +53,11 @@ namespace FinanceAdvisor.API.Controllers
             return Ok(advisors);
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] AdvisorDto dto)
         {
             await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = dto.AdvisorId }, dto);
+            return NoContent();
         }
 
         [HttpPut("{id:guid}")]

@@ -5,8 +5,8 @@ namespace FinanceAdvisor.Application.Interfaces
     public interface IConsultationService
     {
         Task<IEnumerable<ConsultationDto>> GetAllAsync();
-        Task<IEnumerable<ConsultationDto>> GetAllByAdvisorIdAsync(Guid advisorId);
-        Task<IEnumerable<ConsultationDto>> GetAllByClientIdAsync(Guid clientId);
+        Task<IEnumerable<ConsultationDto>> GetAllByAdvisorIdAsync(Guid advisorId, string? consultationType);
+        Task<IEnumerable<ConsultationDto>> GetAllByClientIdAsync(Guid clientId, string? consultationType);
 
         Task<ConsultationDto?> CreateAsync(CreateConsultationDto dto);
         Task<bool> UpdateAsync(UpdateConsultationDto dto);

@@ -1,0 +1,75 @@
+﻿@using FinanceAdvisor.Domain.Enums
+@model IEnumerable<FinanceAdvisor.Web.Models.ConsultationViewModel>
+
+@{
+    ViewData["Title"] = "Consultation";
+
+    // Fallback to default if model is empty
+    ConsultationType consultationType = ConsultationType.CreditAdvisory; // default
+
+    switch (ViewBag.Filter?.ToLower())
+    {
+        case "creditadvisory":
+            consultationType = ConsultationType.CreditAdvisory;
+            break;
+        case "investmentadvisory":
+            consultationType = ConsultationType.InvestmentAdvisory;
+            break;
+        case "securityadvisory":
+            consultationType = ConsultationType.SecurityAdvisory;
+            break;
+    }
+
+    bool isClientOrAdvisor = User.Claims.Any(c =>
+        c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+        (c.Value == "User" || c.Value == "Advisor"));
+}
+
+<h2>Consultations</h2>
+
+@if (isClientOrAdvisor)
+{
+    <!-- Create Button -->
+    <div class="mb-3">
+        <a asp-controller="Consultation"
+           asp-action="Create"
+           asp-route-filter="@consultationType"
+           class="btn btn-primary">
+            Create New Consultation
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Advisor</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var consultation in Model)
+            {
+                <tr>
+                    <td>@consultation.ConsultationId</td>
+                    <td>@consultation.AdvisorId</td>
+                    <td>@consultation.ClientId</td>
+                    <td>@consultation.ScheduledDateTime.ToString("yyyy-MM-dd")</td>
+                    <td>@consultation.Status</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@consultation.ConsultationId" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="Edit" asp-route-id="@consultation.ConsultationId" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@consultation.ConsultationId" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">Please log in to view your consultations.</div>
+}

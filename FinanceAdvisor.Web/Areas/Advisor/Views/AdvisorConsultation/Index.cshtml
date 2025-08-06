@@ -1,0 +1,49 @@
+@model IEnumerable<FinanceAdvisor.Web.Models.ConsultationViewModel>
+@{
+    ViewData["Title"] = "Consultations";
+}
+
+<h2>Consultations</h2>
+
+<a href="/Admin/ConsultationManagement/Create" class="btn btn-success mb-3">
+    + Create New Consultation
+</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            
+            <th>Advisor</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th colspan="3">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var consultation in Model)
+        {
+            <tr>
+                
+                <td>@consultation.AdvisorName</td>
+                <td>@consultation.ClientName</td>
+                <td>@consultation.ScheduledDateTime.ToString("yyyy-MM-dd")</td>
+                <td>@consultation.Status</td>
+                <td>
+                    <a href="/Admin/ConsultationManagement/Update/@consultation.ConsultationId"
+                       class="btn btn-sm btn-primary">Edit</a>
+                </td>
+                <td>
+                    <form action="/Admin/ConsultationManagement/Delete"
+                          method="post"
+                          class="d-inline">
+                        <input type="hidden" name="id" value="@consultation.ConsultationId" />
+                        <input type="hidden" name="advisorId" value="@consultation.AdvisorId" />
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>

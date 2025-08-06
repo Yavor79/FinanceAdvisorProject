@@ -225,28 +225,31 @@ namespace FinanceAdvisor.Web
                 app.UseHsts();
             }
 
+            app.UseStatusCodePagesWithRedirects("Home/Error?statusCode={0}");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.Use(async (context, next) =>
-            {
-                await next(); // Let the request run
+            //app.Use(async (context, next) =>
+            //{
+            //    await next(); // Let the request run
 
-                if (context.Response.Headers.TryGetValue("Set-Cookie", out var setCookie))
-                {
-                    Console.WriteLine("🍪 Cookie(s) issued in response:");
-                    foreach (var cookie in setCookie)
-                    {
-                        Console.WriteLine(cookie);
-                    }
-                }
-            });
+            //    if (context.Response.Headers.TryGetValue("Set-Cookie", out var setCookie))
+            //    {
+            //        Console.WriteLine("🍪 Cookie(s) issued in response:");
+            //        foreach (var cookie in setCookie)
+            //        {
+            //            Console.WriteLine(cookie);
+            //        }
+            //    }
+            //});
 
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseMiddleware<AdminRedirectMiddleware>();
+            //app.UseMiddleware<AdvisorRedirectMiddleware>();
 
             app.MapControllerRoute(
                 name: "Areas",

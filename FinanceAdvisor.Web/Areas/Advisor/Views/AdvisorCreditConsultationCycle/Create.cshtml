@@ -1,0 +1,37 @@
+@model CreateCreditConsultationCycleViewModel
+
+@{
+    ViewData["Title"] = "Create Credit Consultation Cycle";
+}
+
+<h2>Create Credit Consultation Cycle</h2>
+
+<form asp-controller="CreditConsultationCycleManagement" asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="ClientId" class="control-label"></label>
+        <input asp-for="ClientId" class="form-control" />
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AdvisorId" class="control-label"></label>
+        <input asp-for="AdvisorId" class="form-control" />
+        <span asp-validation-for="AdvisorId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CreditType" class="form-label">Consultation Type</label>
+        <select asp-for="CreditType" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.CreditType>()">
+            <option value="">Select one</option>
+        </select>
+        <span asp-validation-for="CreditType" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -4,6 +4,7 @@ using FinanceAdvisor.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System.Net;
 
 namespace FinanceAdvisor.Web.Controllers
@@ -18,6 +19,8 @@ namespace FinanceAdvisor.Web.Controllers
         private readonly IHttpClientFactory httpClientFactory;
         private IMapper mapper;
         private ITokenRefreshService tokenService;
+        protected Guid clientId;
+        protected Guid advisorId;
 
         public BaseController(
             IHttpClientFactory httpClientFactory,
@@ -29,8 +32,33 @@ namespace FinanceAdvisor.Web.Controllers
             _mapper = mapper;
             _tokenService = tokenService;
             _logger = logger;
+
         }
-        
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            if(User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User")){
+                Console.WriteLine("------------------------------------------------------------------------------------------");
+            }
+
+            var clientIdClaim = User.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
+            Console.WriteLine(clientIdClaim + "--------------------------------------------------------------------------");
+            if (Guid.TryParse(clientIdClaim, out var parsedClientId))
+            {
+                Console.WriteLine(parsedClientId+"--------------------------------------------------------------------------");
+                clientId = parsedClientId;
+            }
+
+            var advisorIdClaim = User.Claims.FirstOrDefault(c => c.Type == "advisor_id")?.Value;
+            if (Guid.TryParse(advisorIdClaim, out var parsedAdvisorId))
+            {
+                Console.WriteLine(parsedAdvisorId + "--------------------------------------------------------------------------");
+                advisorId = parsedAdvisorId;
+            }
+        }
+
 
         protected async Task<T?> GetAsync<T>(string endpoint)
         {

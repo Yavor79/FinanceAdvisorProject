@@ -10,13 +10,13 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
     
     public class ConsultationManagementController : BaseAdminController
     {
-        private readonly ILogger<CreditConsultationsCycleController> _logger;
+        private readonly ILogger<ConsultationManagementController> _logger;
 
         public ConsultationManagementController(
             IHttpClientFactory httpClientFactory,
             IMapper mapper,
             ITokenRefreshService tokenService,
-            ILogger<CreditConsultationsCycleController> logger)
+            ILogger<ConsultationManagementController> logger)
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;
@@ -26,7 +26,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             Console.WriteLine("=== CreateConsultationViewModel Log ===");
             Console.WriteLine($"ClientId: {vm.ClientId}");
             Console.WriteLine($"AdvisorId: {vm.AdvisorId}");
-            Console.WriteLine($"ScheduledAt: {vm.ScheduledAt}");
+            Console.WriteLine($"ScheduledAt: {vm.ScheduledDateTime}");
             Console.WriteLine($"ConsultationType: {vm.ConsultationType}");
             Console.WriteLine("========================================");
         }

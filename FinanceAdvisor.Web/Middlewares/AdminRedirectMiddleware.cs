@@ -44,7 +44,7 @@
 
             if (context.User.Identity?.IsAuthenticated == true)
             {
-                Console.WriteLine("/////// Checking user claims for role:");
+
                 foreach (var claim in context.User.Claims)
                 {
                     Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
@@ -70,12 +70,32 @@
 
                 }
 
+                //var isAdvisor = context.User.Claims.Any(c =>
+                //   c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+                //   c.Value == "Advisor");
+
+                //if (isAdvisor)
+                //{
+                //    Console.WriteLine("⭐ Advisor detected");
+                //    var path = context.Request.Path.Value ?? "";
+
+                //    // Prevent infinite redirect loop
+                //    var isAlreadyInAdvisorArea = path.StartsWith("/Advisor", StringComparison.OrdinalIgnoreCase);
+                //    if (!isAlreadyInAdvisorArea)
+                //    {
+                //        Console.WriteLine("⭐ redirecting to /Advisor/AdvisorHome/Index");
+                //        context.Response.Redirect("/Advisor/AdvisorHome/Index");
+                //        return;
+                //    }
+
+
+                //}
+
                 
             }
-
             await _next(context);
         }
+
+
     }
-
-
 }

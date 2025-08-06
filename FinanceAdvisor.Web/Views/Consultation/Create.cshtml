@@ -1,0 +1,64 @@
+﻿@model FinanceAdvisor.Web.Models.CreateConsultationViewModel
+
+@{
+    ViewData["Title"] = "Create Consultation";
+
+    var isClient = User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && (c.Value == "User"));
+    var isAdvisor = User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && (c.Value == "Advisor"));
+
+    var clientId = User.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
+    var advisorId = User.Claims.FirstOrDefault(c => c.Type == "advisor_id")?.Value;
+}
+
+<h2>Create Consultation</h2>
+
+<form asp-action="Create" method="post" class="needs-validation" novalidate>
+
+    @if (!isClient)
+    {
+        <div class="form-group mb-3">
+            <label asp-for="ClientId" class="form-label"></label>
+            <input asp-for="ClientId" class="form-control" />
+            <span asp-validation-for="ClientId" class="text-danger"></span>
+        </div>
+    }
+    else
+    {
+        <input type="hidden" name="ClientId" value="@clientId" />
+    }
+
+    @if (!isAdvisor)
+    {
+        <div class="form-group mb-3">
+            <label asp-for="AdvisorId" class="form-label"></label>
+            <input asp-for="AdvisorId" class="form-control" />
+            <span asp-validation-for="AdvisorId" class="text-danger"></span>
+        </div>
+    }
+    else
+    {
+        <input type="hidden" name="AdvisorId" value="@advisorId" />
+    }
+
+    <div class="form-group mb-3">
+        <label asp-for="ScheduledDateTime" class="form-label"></label>
+        <input asp-for="ScheduledDateTime" class="form-control" type="datetime-local" />
+        <span asp-validation-for="ScheduledDateTime" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="form-label">Consultation Type</label>
+        <input type="hidden" asp-for="ConsultationType" />
+        <input type="text" class="form-control" value="@Model.ConsultationType.ToString()" disabled />
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -5,17 +5,17 @@ using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceAdvisor.Web.Areas.Admin.Controllers
+namespace FinanceAdvisor.Web.Controllers
 {
-    public class CreditConsultationCycleController : BaseController
+    public class AdvisorCreditConsultationCycleController : AdvisorBaseController
     {
-        private readonly ILogger<CreditConsultationCycleController> _logger;
+        private readonly ILogger<AdvisorCreditConsultationCycleController> _logger;
 
-        public CreditConsultationCycleController(
+        public AdvisorCreditConsultationCycleController(
             IHttpClientFactory httpClientFactory,
             IMapper mapper,
             ITokenRefreshService tokenService,
-            ILogger<CreditConsultationCycleController> logger)
+            ILogger<AdvisorCreditConsultationCycleController> logger)
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;
@@ -65,7 +65,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             return View(viewModel);
         }
 
-       
+
 
         [HttpGet]
         public IActionResult Create()

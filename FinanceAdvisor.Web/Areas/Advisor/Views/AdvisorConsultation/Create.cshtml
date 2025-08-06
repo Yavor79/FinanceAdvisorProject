@@ -1,0 +1,74 @@
+﻿@model FinanceAdvisor.Web.Models.CreateConsultationViewModel
+
+@{
+    ViewData["Title"] = "Create Consultation";
+}
+
+<h2>Create Consultation</h2>
+
+<form asp-controller="ConsultationManagement" asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="ClientId" class="form-label"></label>
+        <input asp-for="ClientId" class="form-control" />
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AdvisorId" class="form-label"></label>
+        <input asp-for="AdvisorId" class="form-control" />
+        <span asp-validation-for="AdvisorId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ScheduledDateTime" class="form-label"></label>
+        <input asp-for="ScheduledDateTime" class="form-control" type="datetime-local"
+               value="@Model.ScheduledDateTime.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="ScheduledDateTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ConsultationType" class="form-label">Consultation Type</label>
+        <select asp-for="ConsultationType" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.ConsultationType>()">
+            <option value="">Select one</option>
+        </select>
+        <span asp-validation-for="ConsultationType" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <form asp-controller="ConsultationManagement" asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="ClientId" class="form-label"></label>
+        <input asp-for="ClientId" class="form-control" />
+        <span asp-validation-for="ClientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AdvisorId" class="form-label"></label>
+        <input asp-for="AdvisorId" class="form-control" />
+        <span asp-validation-for="AdvisorId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+            <label asp-for="ScheduledDateTime" class="form-label"></label>
+            <input asp-for="ScheduledDateTime" class="form-control" type="datetime-local" sp-format="{0:yyyy-MM-ddTHH:mm}"
+                   value="@Model.ScheduledDateTime" />
+            <span asp-validation-for="ScheduledDateTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ConsultationType" class="form-label">Consultation Type</label>
+        <select asp-for="ConsultationType" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.ConsultationType>()">
+            <option value="">Select one</option>
+        </select>
+        <span asp-validation-for="ConsultationType" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+<a href="/Admin/ConsultationManagement" class="btn btn-secondary">Cancel</a>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
