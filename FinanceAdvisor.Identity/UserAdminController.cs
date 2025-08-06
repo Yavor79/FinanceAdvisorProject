@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceAdvisor.Identity
 {
+    //[Authorize(AuthenticationSchemes = "Bearer", Policy = "AdminOnly")]
     [ApiController]
     [Route("api/admin/users")]
     
@@ -18,6 +19,14 @@ namespace FinanceAdvisor.Identity
         {
             _userManager = userManager;
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("debug-claims")]
+        public IActionResult DebugClaims()
+        {
+            return Ok(User.Claims.Select(c => new { c.Type, c.Value }));
+        }
+
 
         [HttpPost("{id}/role")]
         public async Task<IActionResult> SetRole(Guid id, [FromBody] string role)

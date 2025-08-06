@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Duende.IdentityServer.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FinanceAdvisor.Identity
 {
@@ -76,7 +77,6 @@ namespace FinanceAdvisor.Identity
                 .AddDeveloperSigningCredential(); // Don't use in prod
 
             builder.Services.AddAuthentication()
-                
                 .AddJwtBearer("Bearer", options =>
                 {
                     options.Authority = "https://localhost:7150"; // Your IdentityServer

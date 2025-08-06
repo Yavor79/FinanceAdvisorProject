@@ -10,6 +10,7 @@ using FinanceAdvisor.Web.Middlewares;
 using FinanceAdvisor.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceAdvisor.Web
 {
@@ -213,7 +214,10 @@ namespace FinanceAdvisor.Web
 
 
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews((options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            }));
 
             var app = builder.Build();
 
@@ -225,7 +229,9 @@ namespace FinanceAdvisor.Web
                 app.UseHsts();
             }
 
+            app.UseExceptionHandler("/Home/Error");
             app.UseStatusCodePagesWithRedirects("Home/Error?statusCode={0}");
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

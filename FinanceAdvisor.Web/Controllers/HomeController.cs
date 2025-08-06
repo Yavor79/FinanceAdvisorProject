@@ -2,6 +2,7 @@ using AutoMapper;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Linq;
@@ -68,6 +69,15 @@ namespace FinanceAdvisor.Web.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(int? statusCode)
         {
+            var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+            if (exception is InvalidOperationException ioe && ioe.Message.Contains("The view"))
+            {
+                // Optionally, you could log the exception or inspect it further
+                _logger.LogWarning("Missing view detected. Redirecting to FunctionalityToBeImplemented.");
+                return this.View("FunctionalityToBeImplemented");
+            }
+
             switch (statusCode)
             {
                 case 401:
