@@ -42,7 +42,7 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Id</th>
+                
                 <th>Advisor</th>
                 <th>Client</th>
                 <th>Date</th>
@@ -54,9 +54,9 @@
             @foreach (var consultation in Model)
             {
                 <tr>
-                    <td>@consultation.ConsultationId</td>
-                    <td>@consultation.AdvisorId</td>
-                    <td>@consultation.ClientId</td>
+                    
+                    <td>@consultation.AdvisorName</td>
+                    <td>@consultation.ClientName</td>
                     <td>@consultation.ScheduledDateTime.ToString("yyyy-MM-dd")</td>
                     <td>@consultation.Status</td>
                     <td>
