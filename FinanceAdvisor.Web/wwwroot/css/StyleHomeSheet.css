@@ -1,0 +1,126 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Задължително: за лепкав футър */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #f0f0f0;
+}
+
+/* Обвивката на цялата страница */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1 !important;
+    min-height: 0 !important; /* ако Bootstrap задава височина */
+}
+
+/* Фон */
+body {
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    text-align: center;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* HEADER */
+header {
+    padding: 0px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+nav, header {
+    display: inline;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 1.2rem;
+    background-color: aquamarine;
+}
+
+    nav.page-wrapper {
+        background-color: aquamarine;
+    }
+
+/* Заглавия */
+h1, h2, h3 {
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.75);
+    color: #222;
+    display: block;
+    padding: 10px 10px;
+    border-radius: 10px;
+    margin: 15px 20px;
+    /*    animation: growFade 1.5s ease-in-out infinite;*/
+    animation: growFade 1.5s ease-in-out;
+}
+
+/* Параграфи */
+p {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 10px auto;
+    background-color: rgba(255, 255, 255, 0.65);
+    color: #000;
+    border-radius: 10px;
+}
+
+/* Списъци */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+ul, li {
+    font-size: 1.5rem;
+    color: #000;
+    max-width: 800px;
+    margin: auto;
+    background-color: rgba(255, 255, 255, 0.65);
+    padding: 0px;
+    border-radius: 10px;
+}
+
+/* Анимация */
+@keyframes growFade {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+/* Фиксиране футъра най-долу при малко съдържание */
+footer.footer {
+    flex-shrink: 0;
+    background-color: aquamarine;
+    padding: 10px 0;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #222;
+    box-shadow: 0 -1px 4px rgba(0,0,0,0.15);
+}

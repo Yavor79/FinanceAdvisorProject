@@ -29,21 +29,11 @@ namespace FinanceAdvisor.Web.Controllers
         public IActionResult Index()
         {
 
-            if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin"))
-            {
-                Console.WriteLine("***/////////////////////////Admin");
-            }
-            else if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Advisor"))
-            {
-                Console.WriteLine("---------/////////////////////////ADvisor");
-            }
-            else if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User"))
-            {
-                Console.WriteLine("//***************/////////////////////////User");
-            }
-            else { Console.WriteLine("/////////////////////////Nooooooooo"); }
+            return View();
+        }
 
-
+        public IActionResult Contacts()
+        {
             return View();
         }
 

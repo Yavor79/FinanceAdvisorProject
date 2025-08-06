@@ -9,74 +9,82 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FinanceAdvisor.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/StyleHomeSheet.css" asp-append-version="true" />
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FinanceAdvisor.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        
-                        
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="InvestmentAdvisory">
-                                Investment Consultations
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="CreditAdvisory">
-                                Credit Consultations
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="SecurityAdvisory">
-                                Security Consultations
-                            </a>
-                        </li>
+    <div class="page-wrapper">
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container-fluid">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FinanceAdvisor.Web</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
 
 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="CreditConsultationCycle" asp-action="Index">Credit Cycles</a>
-                        </li>
-                        
-                        
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="InvestmentAdvisory">
+                                    Investment Consultations
+                                </a>
+                            </li>
 
-                        
-                    </ul>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="CreditAdvisory">
+                                    Credit Consultations
+                                </a>
+                            </li>
 
-                    <ul class="navbar-nav" id="auth-buttons">
-                        <li class="nav-item">
-                            <span class="text-muted">Loading...</span>
-                        </li>
-                    </ul>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="SecurityAdvisory">
+                                    Security Consultations
+                                </a>
+                            </li>
 
 
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="CreditConsultationCycle" asp-action="Index">Credit Cycles</a>
+                            </li>
+
+
+
+
+                        </ul>
+
+                        <ul class="navbar-nav" id="auth-buttons">
+                            <li class="nav-item">
+                                <span class="text-muted">Loading...</span>
+                            </li>
+                        </ul>
+
+
+                    </div>
                 </div>
+            </nav>
+        </header>
+        <main role="main" class="flex-grow-1 pb-3">
+            <div class="container">
+                @RenderBody()
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
         </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - FinanceAdvisor.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2025 - FinanceAdvisor.Web -
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <a asp-area="" asp-controller="Home" asp-action="Contacts" style="margin-left: 20px;">Contacts</a>
+                <span class="float-end">
+                    <a asp-area="" asp-controller="Home" asp-action="Index">Back to top</a>
+                </span>
+            </div>
+        </footer>
+    </div>
     <script src="~/js/CheckIfAuthenticated.js" asp-append-version="true"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
