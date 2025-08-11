@@ -2,51 +2,138 @@
 
 @{
     ViewData["Title"] = "Credit Consultation Cycles";
+
+    bool isAdvisor = User.Claims.Any(c =>
+    c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+    (c.Value == "Advisor"));
+
+    bool isUser = User.Claims.Any(c =>
+     c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+    (c.Value == "User"));
 }
 
 <h2>Credit Consultation Cycles</h2>
 
-<!-- Create Button -->
 <div class="mb-3">
     <a asp-controller="CreditConsultationCycle" asp-action="Create" class="btn btn-primary">
         Create New Credit Cycle
     </a>
 </div>
-@if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && (c.Value == "User" || c.Value == "Advisor")))
+
+@if (isUser || isAdvisor)
 {
     <table class="table table-bordered table-striped">
-        <thead>
+    <thead>
+        <tr>
+                @if (isAdvisor)
+                {
+                    <th>Client</th>
+                }
+                @if (isUser)
+                {
+                    <th>Advisor</th>
+                }
+
+            <th>Credit Type</th>
+            <th>Status</th>
+            <th>Meetings</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
             <tr>
-                <th>Client</th>
-                <th>Advisor</th>
-                <th>Credit Type</th>
-                <th>Status</th>
-                <th>Meetings</th>
-                <th>Created</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
+                @if (isAdvisor)
+                {
                     <td>@item.ClientName</td>
+                }
+                @if (isUser)
+                {
                     <td>@item.AdvisorName</td>
-                    <td>@item.CreditType</td>
-                    <td>@item.Status</td>
-                    <td>@item.MeetingCount</td>
-                    <td>@item.CreatedAt.ToShortDateString()</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Details</a>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                }
+                <td>@item.CreditType</td>
+                <td>
+                    @if (isAdvisor)
+                    {
+                        <select id="status-@item.Id" class="form-select"
+                                asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Status>()"
+                        >
+                            <option value="@item.Status" selected>@item.Status</option>
+                        </select>
+                        <button type="button"
+                                class="btn btn-sm btn-success mt-1 update-status-btn"
+                                data-cycle-id="@item.Id"
+                                data-credit-type="@item.CreditType"
+                                onclick="changeStatus(this)">
+                            Update
+                        </button>
+
+                    }
+                    else
+                    {
+                        @item.Status
+                    }
+                </td>
+                <td>@item.MeetingCount</td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>
+                    <a asp-controller="Meetings" asp-action="ByCycleId" asp-route-cycleId="@item.Id" class="btn btn-info btn-sm">View Meetings</a>
+
+                    <form asp-action="Delete" asp-route-id="@item.Id" asp-route-advisorId="@item.AdvisorId" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this credit cycle?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 }
 else
 {
-<div class="alert alert-warning">Please log in to view your consultations.</div>
+    <div class="alert alert-warning">Please log in to view your consultations.</div>
+}
+@section Scripts {
+    <script>
+        const accessToken = '@ViewBag.AccessToken';
+
+        async function changeStatus(button) {
+            const cycleId = button.getAttribute("data-cycle-id");
+            const creditType = button.getAttribute("data-credit-type");
+            const selectEl = document.getElementById(`status-${cycleId}`);
+            const selectedStatus = selectEl.value;
+
+            const dto = {
+                id: cycleId,
+                creditType: creditType, // send current credit type if required
+                status: selectedStatus
+            };
+
+            try {
+                const res = await fetch("https://localhost:7206/api/v1/CreditConsultationCycle", {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(dto)
+                });
+
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const errMsg = await res.text();
+                    alert(`Failed to update status: ${errMsg}`);
+                }
+            } catch (err) {
+                console.error("Error updating status:", err);
+            }
+        }
+    </script>
 }

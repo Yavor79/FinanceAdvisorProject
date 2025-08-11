@@ -9,6 +9,7 @@ namespace FinanceAdvisor.Web.Mappings
         public AdvisorProfile()
         {
             CreateMap<AdvisorDto, AdvisorViewModel>();
+            CreateMap<AdvisorDto, ChooseAdvisorViewModel>();
             CreateMap<AdvisorViewModel, AdvisorDto>();
             CreateMap<CreateApplicationUserViewModel, AdvisorDto>();
             CreateMap<AdvisorDto, CreateApplicationUserViewModel>();

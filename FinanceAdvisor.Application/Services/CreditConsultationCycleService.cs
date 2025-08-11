@@ -25,7 +25,7 @@ namespace FinanceAdvisor.Application.Services
             var user = await _applicationUserRepository.GetByIdAsync(cycle.ClientId);
             var userEmail = user?.Email;
 
-            var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId);
+            var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId, true);
             var advisorUser = await _applicationUserRepository.GetByIdAsync(advisor.UserId);
             var advisorUserEmail = advisorUser?.Email;
 
@@ -49,7 +49,8 @@ namespace FinanceAdvisor.Application.Services
                 var user = await _applicationUserRepository.GetByIdAsync(cycle.ClientId);
                 var userEmail = user?.Email;
 
-                var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId);
+                // Advisor has Query Filter => if he's deleted the repo won't find him
+                var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId, true);
                 var advisorUser = await _applicationUserRepository.GetByIdAsync(advisor.UserId);
                 var advisorUserEmail = advisorUser?.Email;
 

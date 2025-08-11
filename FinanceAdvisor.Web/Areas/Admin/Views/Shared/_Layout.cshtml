@@ -37,8 +37,8 @@
                                 <a class="nav-link" asp-controller="CreditConsultationsCycle" asp-action="Index">Credit Cycles</a>
                             </li>
                         }
-                        
-                        
+
+
                         @if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Admin"))
                         {
                             <li class="nav-item">
@@ -77,11 +77,11 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - FinanceAdvisor.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+   @*   <footer class="border-top footer text-muted">
+         <div class="container">
+             &copy; 2025 - FinanceAdvisor.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+         </div>
+     </footer> *@
     <script src="~/js/AdminLogoutRedirect.js" asp-append-version="true"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,4 +1,4 @@
-@model UpdateCreditConsultationCycleViewModel
+@model FinanceAdvisor.Web.Models.UpdateCreditConsultationCycleViewModel
 
 @{
     ViewData["Title"] = "Edit Credit Consultation Cycle";
@@ -7,12 +7,27 @@
 <h2>Edit Credit Consultation Cycle</h2>
 
 <form asp-controller="CreditConsultationCycleManagement" asp-action="Edit" method="post">
-    
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
 
     <div class="form-group">
-        <label asp-for="AdvisorId" class="control-label"></label>
-        <input asp-for="AdvisorId" class="form-control" />
+        <label asp-for="AdvisorId" class="control-label">Advisor</label>
+        <select asp-for="AdvisorId" class="form-control">
+            @* Render options from ChooseAdvisors *@
+            @foreach (var advisor in Model.ChooseAdvisors)
+            {
+                <option value="@advisor.AdvisorId" selected="@(advisor.AdvisorId == Model.AdvisorId ? "selected" : null)">
+                    @advisor.AdvisorName
+                </option>
+            }
+
+
+            @* If current advisor not in list, add it manually *@
+            @if (!Model.ChooseAdvisors.Any(a => a.AdvisorId == Model.AdvisorId) && !string.IsNullOrEmpty(Model.AdvisorName))
+            {
+                <option value="@Model.AdvisorId" selected>@Model.AdvisorName</option>
+            }
+        </select>
         <span asp-validation-for="AdvisorId" class="text-danger"></span>
     </div>
 
@@ -27,7 +42,5 @@
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }

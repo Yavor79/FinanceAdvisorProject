@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceAdvisor.API.Controllers
 {
     [Authorize]
-    [Authorize(Policy = "AdminOnly")]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]
@@ -49,6 +49,7 @@ namespace FinanceAdvisor.API.Controllers
             return Ok(users);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ApplicationUserDto dto)
         {
@@ -56,6 +57,7 @@ namespace FinanceAdvisor.API.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         [ProducesResponseType(typeof(ApplicationUserDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -68,7 +70,7 @@ namespace FinanceAdvisor.API.Controllers
             return createdUser;
         }
 
-
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
@@ -76,6 +78,7 @@ namespace FinanceAdvisor.API.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("restore/{id:guid}")]
         public async Task<IActionResult> Restore(Guid id)
         {

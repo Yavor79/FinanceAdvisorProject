@@ -5,7 +5,7 @@
 
 <h2>Consultations</h2>
 
-<a href="/Admin/ConsultationManagement/Create" class="btn btn-success mb-3">
+<a href="/Admin/ConsultationManagement/Create" class="btn btn-success mb-3 ">
     + Create New Consultation
 </a>
 
@@ -37,6 +37,7 @@
                     <form action="/Admin/ConsultationManagement/Delete"
                           method="post"
                           class="d-inline">
+                        @Html.AntiForgeryToken();
                         <input type="hidden" name="id" value="@consultation.ConsultationId" />
                         <input type="hidden" name="advisorId" value="@consultation.AdvisorId" />
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>

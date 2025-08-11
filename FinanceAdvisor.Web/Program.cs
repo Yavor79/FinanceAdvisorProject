@@ -148,12 +148,12 @@ namespace FinanceAdvisor.Web
                             Console.WriteLine($"Property: {prop.Key} = {prop.Value}");
                         }
 
-                        var user = context.Principal;
-                        var roles = identity.FindAll(ClaimTypes.Role).ToArray();
-                        if (roles[0].Value == "Admin")
-                        {
-                            context.Response.Redirect("/Admin/Home/Index");
-                        }
+                        //var user = context.Principal;
+                        //var roles = identity.FindAll(ClaimTypes.Role).ToArray();
+                        //if (roles[0].Value == "Admin")
+                        //{
+                        //    context.Response.Redirect("/Admin/Home/Index");
+                        //}
 
                         return Task.CompletedTask;
                     };

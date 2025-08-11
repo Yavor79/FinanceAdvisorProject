@@ -1,4 +1,5 @@
 ﻿using FinanceAdvisor.Application.DTOs;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +20,28 @@ namespace FinanceAdvisor.Identity
         {
             _userManager = userManager;
         }
+
+        public static class DtoLogger
+        {
+            public static void LogDto<T>(T dto)
+            {
+                if (dto == null)
+                {
+                    Console.WriteLine("DTO is null");
+                    return;
+                }
+
+                var properties = typeof(T).GetProperties();
+                Console.WriteLine($"Logging DTO of type {typeof(T).Name}:");
+
+                foreach (var prop in properties)
+                {
+                    var value = prop.GetValue(dto);
+                    Console.WriteLine($" - {prop.Name}: {value}");
+                }
+            }
+        }
+
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("debug-claims")]
@@ -62,13 +85,21 @@ namespace FinanceAdvisor.Identity
 
             var usersOnly = await _userManager.GetUsersInRoleAsync("User");
             
-            return usersOnly.Select(u => new ApplicationUserDto
+            var usersDto = usersOnly.Select(u => new ApplicationUserDto
             {
                 Id = u.Id,
                 Email = u.Email,
                 CreatedAt = u.CreatedAt,
                 IsDeleted = u.IsDeleted
             });
+
+            foreach (var dto in usersDto)
+            {
+                DtoLogger.LogDto(dto);
+            }
+           
+
+            return usersDto;
         }
 
         [HttpPost("create")]

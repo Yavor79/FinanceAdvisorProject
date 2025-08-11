@@ -19,7 +19,7 @@
         @foreach (var advisor in Model)
         {
             <tr>
-                <td>@advisor.UserId</td>
+                <td>@advisor.AdvisorName</td>
                 <td>@advisor.Specialization</td>
                 <td>@advisor.CreatedAt.ToString("yyyy-MM-dd")</td>
                 <td>@advisor.IsDeleted</td>
@@ -28,6 +28,7 @@
                     @if (!advisor.IsDeleted)
                     {
                         <form action="/Admin/AdvisorManagement/Delete" method="post" class="d-inline">
+                            @Html.AntiForgeryToken();
                             <input type="hidden" name="id" value="@advisor.AdvisorId" />
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                         </form>
@@ -35,11 +36,21 @@
                     else
                     {
                         <form action="/Admin/AdvisorManagement/Restore" method="post" class="d-inline">
+                            @Html.AntiForgeryToken();
                             <input type="hidden" name="id" value="@advisor.AdvisorId" />
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Restore</button>
                         </form>
                     }
 
+                </td>
+                <td>
+                    <form method="post" action="/Admin/AdvisorManagement/UpdateRole">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@advisor.UserId" />
+                        <select name="role" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Roles>()">
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-secondary mt-1">Change</button>
+                    </form>
                 </td>
             </tr>
         }

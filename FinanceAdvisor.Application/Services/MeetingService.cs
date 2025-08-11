@@ -73,6 +73,12 @@ namespace FinanceAdvisor.Application.Services
                 Type = dto.Type
             };
 
+            Console.WriteLine($"Id: {meeting.Id}");
+            Console.WriteLine($"CreditConsultationCycleId: {meeting.CreditConsultationCycleId}");
+            Console.WriteLine($"ScheduledDateTime: {meeting.ScheduledDateTime}");
+            Console.WriteLine($"Type: {meeting.Type}");
+            Console.WriteLine("-----------------------------");
+
             await _repository.AddAsync(meeting);
 
             return new MeetingDto
@@ -89,8 +95,9 @@ namespace FinanceAdvisor.Application.Services
             var entity = await _repository.GetByIdAsync(dto.Id);
             if (entity == null) return false;
 
-            entity.ScheduledDateTime = dto.ScheduledDateTime;
-            entity.Type = dto.Type;
+            if(dto.ScheduledDateTime.HasValue) { entity.ScheduledDateTime = dto.ScheduledDateTime.Value; }
+            
+            if(dto.Type.HasValue) { entity.Type = dto.Type.Value; }
 
             return await _repository.UpdateAsync(entity);
         }
@@ -103,6 +110,7 @@ namespace FinanceAdvisor.Application.Services
 
             // Optionally check ownership if needed
             // You can extend Meeting entity with AdvisorId if needed
+
             return await _repository.DeleteAsync(entity);
         }
 

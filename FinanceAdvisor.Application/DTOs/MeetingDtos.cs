@@ -20,8 +20,8 @@ namespace FinanceAdvisor.Application.DTOs
     public class UpdateMeetingDto
     {
         public Guid Id { get; set; }
-        public DateTime ScheduledDateTime { get; set; }
-        public FinanceAdvisor.Domain.Enums.Type Type { get; set; }
+        public DateTime? ScheduledDateTime { get; set; }
+        public FinanceAdvisor.Domain.Enums.Type? Type { get; set; }
     }
 
 }

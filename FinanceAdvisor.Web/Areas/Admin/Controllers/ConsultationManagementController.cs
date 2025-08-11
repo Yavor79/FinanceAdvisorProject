@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
@@ -21,6 +23,43 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
         {
             _logger = logger;
         }
+
+        private void LogObjectProperties<T>(string context, IEnumerable<T>? collection)
+        {
+            if (collection == null)
+            {
+                Console.WriteLine($"=== {context} collection is null ===");
+                return;
+            }
+
+            Console.WriteLine($"=== {context} collection logging start ({collection.Count()} items) ===");
+
+            int index = 1;
+            foreach (var item in collection)
+            {
+                Console.WriteLine($"--- Item {index} ---");
+                foreach (var prop in item.GetType().GetProperties())
+                {
+                    var value = prop.GetValue(item, null);
+                    Console.WriteLine($"{prop.Name}: {value}");
+                }
+                index++;
+            }
+
+            Console.WriteLine($"=== {context} collection logging end ===");
+        }
+
+        private Specialization ConvertToSpecialization(ConsultationType type)
+        {
+            return type switch
+            {
+                ConsultationType.CreditAdvisory => Specialization.Credit,
+                ConsultationType.InvestmentAdvisory => Specialization.Investment,
+                ConsultationType.SecurityAdvisory => Specialization.Security,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unsupported consultation type: {type}")
+            };
+        }
+
         public static void Log(CreateConsultationViewModel vm)
         {
             Console.WriteLine("=== CreateConsultationViewModel Log ===");
@@ -83,11 +122,41 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             return View(vm);
         }
 
+
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new CreateConsultationViewModel());
+            
+
+            var model = new CreateConsultationViewModel();
+
+
+
+            var response2 = await _identityServerHttpClient.GetWithRefreshAsync("/api/admin/users/usersOnly", _tokenService);
+            var checkResult2 = await RunChecks(response2);
+            if (checkResult2 != null) return checkResult2;
+
+            if (!response2.IsSuccessStatusCode)
+                return View("Error", $"API Error: {response2.StatusCode}");
+
+
+            var dto2 = await response2.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
+            LogObjectProperties("ApplicationUserDto", dto2);
+            if (dto2 == null)
+            {
+                return View(model);
+            }
+            var vm2 = _mapper.Map<IEnumerable<ChooseUserViewModel>>(dto2);
+            LogObjectProperties("ChooseUserViewModel", vm2);
+            model.ChooseUsers = vm2;
+
+
+            var accessToken = await _tokenService.GetAccessTokenAsync();
+            ViewBag.AccessToken = accessToken;
+            Console.WriteLine($"////////////////Access token: {accessToken}");
+            return View(model);
         }
+
 
 
         [HttpPost]
@@ -124,6 +193,25 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             var dto = await response.Content.ReadFromJsonAsync<ConsultationDto>();
             var vm = _mapper.Map<UpdateConsultationViewModel>(dto);
 
+            //var specialization = Specialization.Credit;
+
+            //var response2 = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/specialization/{specialization}", _tokenService);
+            //var checkResult2 = await RunChecks(response2);
+            //if (checkResult2 != null) return checkResult2;
+
+            //if (!response2.IsSuccessStatusCode)
+            //    return View("Error", $"API Error: {response2.StatusCode}");
+
+
+            //var dto2 = await response2.Content.ReadFromJsonAsync<IEnumerable<AdvisorDto>>();
+            //if (dto2 == null)
+            //{
+            //    return View(vm);
+            //}
+            //var advisorViewModels = _mapper.Map<IEnumerable<ChooseAdvisorViewModel>>(dto2);
+            //vm.ChooseAdvisors = advisorViewModels;
+
+            ViewBag.AccessToken = await _tokenService.GetAccessTokenAsync();
             return View(vm);
         }
 

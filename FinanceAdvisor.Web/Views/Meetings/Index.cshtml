@@ -1,28 +1,191 @@
 ﻿@model IEnumerable<FinanceAdvisor.Web.Models.MeetingViewModel>
+
+@using FinanceAdvisor.Domain.Enums
+
 @{
     ViewData["Title"] = "Meetings";
+
+    bool isAdvisor = User.Claims.Any(c =>
+        c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+        c.Value == "Advisor");
+
+    bool isUser = User.Claims.Any(c =>
+        c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+        c.Value == "User");
+
+    var advisor_id = "";
+    if (isAdvisor)
+    {
+        advisor_id = User.Claims.First(c =>
+        c.Type == "advisor_id").Value;
+    }
+    
+    var meetingTypes = Enum.GetValues(typeof(FinanceAdvisor.Domain.Enums.Type)).Cast<FinanceAdvisor.Domain.Enums.Type>().ToList();
+
+    var accessToken = ViewBag.AccessToken.ToString();
+
 }
 
 <h2>Meetings</h2>
 
+<div class="mb-3">
+    <a asp-controller="Meetings" asp-action="Create" class="btn btn-primary" asp-route-cycleId="@ViewBag.CycleId">
+        Create New Meeting
+    </a>
+</div>
+
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>Id</th>
-            <th>Credit Consultation Cycle</th>
             <th>Scheduled Date</th>
             <th>Type</th>
+            @if (isAdvisor)
+            {
+                <th>Actions</th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var meeting in Model)
         {
             <tr>
-                <td>@meeting.Id</td>
-                <td>@meeting.CreditConsultationCycleId</td>
-                <td>@meeting.ScheduledDateTime.ToString("yyyy-MM-dd HH:mm")</td>
-                <td>@meeting.Type</td>
+                <td>
+                    @if (isAdvisor)
+                    {
+                        <!-- Date input for advisors, default value = model value -->
+                        <input type="datetime-local"
+                               id="date-@meeting.Id"
+                               value="@meeting.ScheduledDateTime.ToString("yyyy-MM-ddTHH:mm")" />
+                        <button class="btn btn-sm btn-success mt-1"
+                                onclick="changeDate('@meeting.Id')">
+                            Change Date
+                        </button>
+                    }
+                    else
+                    {
+                        @meeting.ScheduledDateTime.ToString("yyyy-MM-dd HH:mm")
+                    }
+                </td>
+
+                <td>
+                    @if (isAdvisor)
+                    {
+                        <!-- Dropdown with enum values, default selected = meeting.Type -->
+                        <select id="type-@meeting.Id" class="form-select"
+                                asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Type>()">
+                            <option value="@meeting.Type" selected>@meeting.Type</option>
+                        </select>
+                        <button class="btn btn-sm btn-success mt-1"
+                                onclick="changeType('@meeting.Id')">
+                            Change Type
+                        </button>
+                    }
+                    else
+                    {
+                        @meeting.Type.ToString()
+                    }
+                </td>
+
+                <td>
+                    @if (isAdvisor)
+                    {
+                        <form asp-action="Delete" asp-route-id="@meeting.Id" asp-route-advisorId="@advisor_id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Are you sure you want to delete this meeting?');">
+                                Delete
+                            </button>
+                        </form>
+                    }
+                    
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+
+        console.log("isAdvisor:", @isAdvisor.ToString().ToLower());
+        console.log("isUser:", @isUser.ToString().ToLower());
+        console.log("advisor_id:", "@advisor_id");
+        console.log("accessToken:", "@accessToken");
+
+        console.log("meetingTypes:");
+        var meetingTypes = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(meetingTypes));
+        console.log(meetingTypes);
+
+        const accessToken = '@accessToken';
+
+        async function changeType(meetingId) {
+            const selectEl = document.getElementById(`type-${meetingId}`);
+            const selectedType = selectEl.value;
+
+            const dto = {
+                id: meetingId,
+                type: parseInt(selectedType),
+                scheduledDateTime: null  // no date change here
+            };
+
+            try {
+                const res = await fetch('https://localhost:7206/api/v1/Meetings', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dto)
+                });
+
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const errMsg = await res.text();
+                    alert(`Failed to update type: ${errMsg}`);
+                }
+            } catch (error) {
+                console.error('Error updating type:', error);
+            }
+        }
+
+        async function changeDate(meetingId) {
+            const inputEl = document.getElementById(`date-${meetingId}`);
+            const selectedDate = inputEl.value;  // in yyyy-MM-ddTHH:mm format
+
+            if (!selectedDate) {
+                alert('Please select a valid date and time.');
+                return;
+            }
+
+            // Convert to ISO string for backend, assuming local datetime input is ISO compatible
+            // const isoDate = new Date(selectedDate).toISOString();
+
+            const dto = {
+                id: meetingId,
+                type: null,  // no type change here
+                scheduledDateTime: selectedDate
+            };
+
+            try {
+                const res = await fetch('https://localhost:7206/api/v1/Meetings', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dto)
+                });
+
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    const errMsg = await res.text();
+                    alert(`Failed to update date: ${errMsg}`);
+                }
+            } catch (error) {
+                console.error('Error updating date:', error);
+            }
+        }
+    </script>
+}

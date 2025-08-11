@@ -132,8 +132,8 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
-        [ValidateAntiForgeryToken]
+        [HttpPost]
+        
         public async Task<IActionResult> Restore(Guid id)
         {
             try
@@ -155,5 +155,42 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             }
         }
 
+        public async Task<IActionResult> UpdateRole(Guid id, Roles role)
+        {
+            string roleString = role.ToString();
+            
+            try
+            {
+                if (roleString != "Advisor")
+                {
+                    var response = await _identityServerHttpClient.PostAsJsonWithRefreshAsync(
+                        $"/api/admin/users/{id}/role",
+                        roleString, _tokenService);
+                    Console.WriteLine($"Status: {response.StatusCode}");
+                    var content = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Content: {content}");
+                    var check = await RunChecks(response);
+                    if (check != null)
+                        return check;
+
+                    if (!response.IsSuccessStatusCode)
+                        return View("Error", "Failed to update user role.");
+
+                    var resp = await _httpClient.DeleteWithRefreshAsync($"/api/v1/Advisors/{id}", _tokenService);
+                    var _check = await RunChecks(resp);
+                    if (_check != null) return _check;
+
+                }
+                
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"🔥 Exception: {ex.Message}");
+                return View("Error", $"Exception thrown: {ex.Message}");
+            }
+
+        }
     }
 }

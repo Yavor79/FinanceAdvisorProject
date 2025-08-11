@@ -11,6 +11,9 @@ namespace FinanceAdvisor.Web.Mappings
         {
             // View only
             CreateMap<ApplicationUserDto, ApplicationUserViewModel>();
+            CreateMap<ApplicationUserDto, ChooseUserViewModel>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email));
+
 
             // Create
             CreateMap<CreateApplicationUserViewModel, ApplicationUserDto>();

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
@@ -21,6 +22,8 @@ namespace FinanceAdvisor.Web.Controllers
         {
             _logger = logger;
         }
+
+
 
         [AllowAnonymous]
         public async Task<IActionResult> Index()
@@ -65,6 +68,9 @@ namespace FinanceAdvisor.Web.Controllers
                     viewModels = dtos != null
                         ? _mapper.Map<IEnumerable<CreditConsultationCycleViewModel>>(dtos)
                         : new List<CreditConsultationCycleViewModel>();
+                    var accessToken = _tokenService.GetAccessTokenAsync();
+                    Console.WriteLine($"Acse///////////////{accessToken}");
+                    ViewBag.AccessToken = accessToken;
                     return View(viewModels);
                 }
 
@@ -99,10 +105,59 @@ namespace FinanceAdvisor.Web.Controllers
 
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new CreateCreditConsultationCycleViewModel());
+            var isAdvisor = User.Claims.Any(c =>
+                    c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Advisor");
+
+            var isClient = User.Claims.Any(c =>
+                c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User");
+
+            var model = new CreateCreditConsultationCycleViewModel();
+
+            if (isAdvisor)
+            {
+                var response = await _identityServerHttpClient.GetWithRefreshAsync("/api/admin/users/usersOnly", _tokenService);
+                var checkResult = await RunChecks(response);
+                if (checkResult != null) return checkResult;
+
+                if (!response.IsSuccessStatusCode)
+                    return View("Error", $"API Error: {response.StatusCode}");
+
+
+                var dto = await response.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
+                
+                if (dto == null)
+                {
+                    return View(model);
+                }
+                var vm = _mapper.Map<IEnumerable<ChooseUserViewModel>>(dto);
+                
+                model.ChooseUsers = vm;
+            }
+            else if (isClient)
+            {
+                var response = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/specialization/{Specialization.Credit.ToString()}", _tokenService);
+                var checkResult = await RunChecks(response);
+                if (checkResult != null) return checkResult;
+
+                if (!response.IsSuccessStatusCode)
+                    return View("Error", $"API Error: {response.StatusCode}");
+
+
+                var dto = await response.Content.ReadFromJsonAsync<IEnumerable<AdvisorDto>>();
+                if (dto == null)
+                {
+                    return View(model);
+                }
+                var vm = _mapper.Map<IEnumerable<ChooseAdvisorViewModel>>(dto);
+                model.ChooseAdvisors = vm;
+            }
+
+            return View(model);
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateCreditConsultationCycleViewModel model)

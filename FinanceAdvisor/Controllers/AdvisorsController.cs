@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinanceAdvisor.API.Controllers
 {
     [Authorize]
-    [Authorize(Policy = "AdminOnly")]
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     [Produces("application/json")]
@@ -53,6 +53,7 @@ namespace FinanceAdvisor.API.Controllers
             return Ok(advisors);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] AdvisorDto dto)
         {
@@ -60,6 +61,7 @@ namespace FinanceAdvisor.API.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] AdvisorDto dto)
         {
@@ -67,6 +69,7 @@ namespace FinanceAdvisor.API.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
@@ -74,10 +77,12 @@ namespace FinanceAdvisor.API.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("restore/{id:guid}")]
         public async Task<IActionResult> Restore(Guid id)
         {
-            await _service.RestoreAsync(id);
+            var result = await _service.RestoreAsync(id);
+            Console.WriteLine($"Result////////////////{result}");
             return NoContent();
         }
     }

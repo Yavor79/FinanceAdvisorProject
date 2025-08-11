@@ -12,7 +12,6 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
     public class UserManagementController : BaseAdminController
     {
         private readonly ILogger<UserManagementController> _logger;
-        private readonly HttpClient _identityServerHttpClient;
 
         public UserManagementController(
             IHttpClientFactory httpClientFactory,
@@ -22,7 +21,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             : base(httpClientFactory, mapper, tokenService, logger)
         {
             _logger = logger;
-            _identityServerHttpClient = httpClientFactory.CreateClient("IdentityServerAPI");
+            
         }
 
         //public async Task<IActionResult> Index()
@@ -270,39 +269,41 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             string roleString = role.ToString();
             try
             {
-                var response = await _identityServerHttpClient.PostAsJsonWithRefreshAsync(
-                $"/api/admin/users/{id}/role",
-                roleString, _tokenService);
-                Console.WriteLine($"Status: {response.StatusCode}");
-                var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Content: {content}");
-                var check = await RunChecks(response);
-                if (check != null)
-                    return check;
-
-                if (!response.IsSuccessStatusCode)
-                    return View("Error", "Failed to update user role.");
-
-                // should create the Domain entity as well!
-                if (roleString == "Advisor")
+                if (roleString != "User")
                 {
-                    AdvisorDto advisorDto = new AdvisorDto
+                    var response = await _identityServerHttpClient.PostAsJsonWithRefreshAsync(
+                    $"/api/admin/users/{id}/role",
+                    roleString, _tokenService);
+                    Console.WriteLine($"Status: {response.StatusCode}");
+                    var content = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Content: {content}");
+                    var check = await RunChecks(response);
+                    if (check != null)
+                        return check;
+
+                    if (!response.IsSuccessStatusCode)
+                        return View("Error", "Failed to update user role.");
+
+                    // should create the Domain entity as well!
+                    if (roleString == "Advisor")
                     {
-                        UserId = id,
-                    };
-                    var response2 = await _httpClient.PostAsJsonWithRefreshAsync("api/v1/Advisors/create", advisorDto, _tokenService);
-                    Console.WriteLine($"Status: {response2.StatusCode}");
-                    var content2 = await response2.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Content: {content2}");
-                    var checkResult2 = await RunChecks(response2);
-                    if (checkResult2 != null)
-                        return checkResult2;
+                        AdvisorDto advisorDto = new AdvisorDto
+                        {
+                            UserId = id,
+                        };
+                        var response2 = await _httpClient.PostAsJsonWithRefreshAsync("api/v1/Advisors/create", advisorDto, _tokenService);
+                        Console.WriteLine($"Status: {response2.StatusCode}");
+                        var content2 = await response2.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Content: {content2}");
+                        var checkResult2 = await RunChecks(response2);
+                        if (checkResult2 != null)
+                            return checkResult2;
 
-                    if (!response2.IsSuccessStatusCode)
-                        return View("Error", $"API Error: {response2.StatusCode}");
+                        if (!response2.IsSuccessStatusCode)
+                            return View("Error", $"API Error: {response2.StatusCode}");
+                    }
                 }
-
-
+                
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

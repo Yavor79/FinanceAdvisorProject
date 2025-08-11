@@ -13,6 +13,7 @@ namespace FinanceAdvisor.Web.Controllers
     public class BaseController : Controller
     {
         protected readonly HttpClient _httpClient;
+        protected readonly HttpClient _identityServerHttpClient;
         protected readonly IMapper _mapper;
         protected readonly ITokenRefreshService _tokenService;
         private readonly ILogger<BaseController> _logger;
@@ -29,6 +30,7 @@ namespace FinanceAdvisor.Web.Controllers
             ILogger<BaseController> logger)
         {
             _httpClient = httpClientFactory.CreateClient("FinanceAdvisorAPI");
+            _identityServerHttpClient = httpClientFactory.CreateClient("IdentityServerAPI");
             _mapper = mapper;
             _tokenService = tokenService;
             _logger = logger;

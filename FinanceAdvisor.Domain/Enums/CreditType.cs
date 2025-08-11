@@ -3,7 +3,7 @@
     public enum CreditType
     {
         Mortgage = 0,
-        Individual = 1,
+        Individual = 1
 
     }
 }

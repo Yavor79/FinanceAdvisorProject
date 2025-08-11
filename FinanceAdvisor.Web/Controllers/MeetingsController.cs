@@ -38,6 +38,10 @@ namespace FinanceAdvisor.Web.Controllers
                 var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<MeetingDto>>();
                 var viewModels = _mapper.Map<IEnumerable<MeetingViewModel>>(dtos);
 
+                var accessToken = await _tokenService.GetAccessTokenAsync();
+                Console.WriteLine($"AccessToken///////////////{accessToken}");
+                ViewBag.AccessToken = accessToken;
+                
                 return View(viewModels);
             }
             catch
@@ -54,6 +58,8 @@ namespace FinanceAdvisor.Web.Controllers
 
             var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<MeetingDto>>();
             var viewModels = _mapper.Map<IEnumerable<MeetingViewModel>>(dtos);
+            ViewBag.CycleId = cycleId;
+            ViewBag.AccessToken = await _tokenService.GetAccessTokenAsync();
             return View("Index", viewModels);
         }
 
@@ -69,7 +75,14 @@ namespace FinanceAdvisor.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create() => View();
+        public IActionResult Create(Guid cycleId)
+        {
+            var vm = new CreateMeetingViewModel
+            {
+                CreditConsultationCycleId = cycleId
+            };
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateMeetingViewModel model)

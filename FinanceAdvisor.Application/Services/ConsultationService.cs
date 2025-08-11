@@ -263,12 +263,25 @@ namespace FinanceAdvisor.Application.Services
             var entity = await _repository.GetByIdAsync(dto.Id);
             if (entity == null) return false;
 
-            entity.ScheduledDateTime = dto.ScheduledDate;
-            entity.Status = dto.Status;
-            entity.ConsultationType = dto.ConsultationType;
+            
+            if (dto.ScheduledDate.HasValue)
+                entity.ScheduledDateTime = dto.ScheduledDate.Value;
+
+            if (dto.Status.HasValue)
+                entity.Status = dto.Status.Value;
+
+            if (dto.ConsultationType.HasValue)
+                entity.ConsultationType = dto.ConsultationType.Value;
+
+            if (dto.ClientId.HasValue)
+                entity.ClientId = dto.ClientId.Value;
+
+            if (dto.AdvisorId.HasValue)
+                entity.AdvisorId = dto.AdvisorId.Value;
 
             return await _repository.UpdateAsync(entity);
         }
+
 
         public async Task<bool> DeleteSelfAsync(Guid consultationId, Guid advisorId)
         {

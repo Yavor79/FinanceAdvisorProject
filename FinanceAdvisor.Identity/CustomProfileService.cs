@@ -41,7 +41,13 @@ public class CustomProfileService : IProfileService
         {
             var advisor = await _dbContext.Advisors.FirstOrDefaultAsync(ad => ad.UserId == user.Id);
 
-            if (advisor != null) { claims.Add(new Claim("advisor_id", advisor.AdvisorId.ToString())); }
+            if (advisor != null) 
+            { 
+                claims.Add(new Claim("advisor_id", advisor.AdvisorId.ToString()));
+                claims.Add(new Claim("advisor_specialization", advisor.Specialization.ToString()));
+            }
+
+
         }
 
         context.IssuedClaims = claims;

@@ -3,33 +3,25 @@
 
 @{
     ViewData["Title"] = "Consultation";
-
-    // Fallback to default if model is empty
-    ConsultationType consultationType = ConsultationType.CreditAdvisory; // default
-
+    ConsultationType consultationType = ConsultationType.CreditAdvisory;
     switch (ViewBag.Filter?.ToLower())
     {
-        case "creditadvisory":
-            consultationType = ConsultationType.CreditAdvisory;
-            break;
-        case "investmentadvisory":
-            consultationType = ConsultationType.InvestmentAdvisory;
-            break;
-        case "securityadvisory":
-            consultationType = ConsultationType.SecurityAdvisory;
-            break;
+        case "investmentadvisory": consultationType = ConsultationType.InvestmentAdvisory; break;
+        case "securityadvisory": consultationType = ConsultationType.SecurityAdvisory; break;
     }
 
-    bool isClientOrAdvisor = User.Claims.Any(c =>
+    bool isAdvisor = User.Claims.Any(c =>
         c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
-        (c.Value == "User" || c.Value == "Advisor"));
+        (c.Value == "Advisor"));
+    bool isUser = User.Claims.Any(c =>
+        c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" &&
+        (c.Value == "User"));
 }
 
 <h2>Consultations</h2>
 
-@if (isClientOrAdvisor)
+@if (isAdvisor || isUser)
 {
-    <!-- Create Button -->
     <div class="mb-3">
         <a asp-controller="Consultation"
            asp-action="Create"
@@ -42,34 +34,142 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                
-                <th>Advisor</th>
-                <th>Client</th>
+                @if (isAdvisor) { <th>Client</th> }
+                @if (isUser) { <th>Advisor</th> }
                 <th>Date</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var consultation in Model)
-            {
-                <tr>
-                    
-                    <td>@consultation.AdvisorName</td>
-                    <td>@consultation.ClientName</td>
-                    <td>@consultation.ScheduledDateTime.ToString("yyyy-MM-dd")</td>
-                    <td>@consultation.Status</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@consultation.ConsultationId" class="btn btn-info btn-sm">Details</a>
-                        <a asp-action="Edit" asp-route-id="@consultation.ConsultationId" class="btn btn-warning btn-sm">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@consultation.ConsultationId" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
-                </tr>
-            }
+        @foreach (var consultation in Model)
+        {
+            <tr>
+                @if (isAdvisor) { <td>@consultation.ClientName</td> }
+                @if (isUser) { <td>@consultation.AdvisorName</td> }
+
+                <td>
+                    @if (isAdvisor)
+                    {
+                        <div class="d-flex gap-1">
+                            <input type="date"
+                                   class="form-control"
+                                   id="date-@consultation.ConsultationId"
+                                   value="@consultation.ScheduledDateTime.ToString("yyyy-MM-dd")" />
+                            <button class="btn btn-outline-primary btn-sm"
+                                        onclick="updateDate('@consultation.ConsultationId', '@consultation.ClientId', '@consultation.AdvisorId', '@consultation.ConsultationType', '@consultation.Status')">
+                                Update Date
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        @consultation.ScheduledDateTime.ToString("yyyy-MM-dd")
+                    }
+                </td>
+
+                <td>
+                    @if (isAdvisor)
+                    {
+                        <div class="d-flex gap-1">
+                            <select class="form-control"
+                                    id="status-@consultation.ConsultationId"
+                            asp-for="@consultation.Status"
+                            asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Status>()">
+                                @foreach (Status s in Enum.GetValues(typeof(Status)))
+                                {
+                                        <option value="@consultation.Status">
+                                            @consultation.Status
+                                    </option>
+                                }
+                            </select>
+                            <button class="btn btn-outline-success btn-sm"
+                                    onclick="updateStatus('@consultation.ConsultationId', '@consultation.ClientId', '@consultation.AdvisorId', '@consultation.ConsultationType', '@consultation.ScheduledDateTime')">
+                                Update Status
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        @consultation.Status
+                    }
+                </td>
+
+                <td>
+                    <form asp-action="Delete"
+                          asp-route-id="@consultation.ConsultationId"
+                          asp-route-advisorId="@consultation.AdvisorId"
+                          method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this consultation?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }
 else
 {
     <div class="alert alert-warning">Please log in to view your consultations.</div>
+}
+
+@section Scripts {
+<script>
+    const token = '@ViewBag.AccessToken';
+    console.log("Token:" + token);
+    async function updateStatus(id) {
+        const status = document.getElementById(`status-${id}`).value;
+
+        const dto = {
+            id: id,
+            clientId: null,
+            advisorId: null,
+            scheduledDate: null,
+            status: parseInt(status), // send as number for enum binding
+            consultationType: null
+        };
+
+        await sendUpdate(dto);
+    }
+
+    async function updateDate(id) {
+        const date = document.getElementById(`date-${id}`).value;
+
+        const dto = {
+            id: id,
+            clientId: null,
+            advisorId: null,
+            scheduledDate: date,
+            status: null,
+            consultationType: null
+        };
+
+        await sendUpdate(dto);
+    }
+    async function sendUpdate(dto) {
+        try {
+                const res = await fetch("https://localhost:7206/api/v1/Consultations", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(dto)
+            });
+
+            if (res.ok) {
+                location.reload();
+            } else {
+                alert("Failed to update consultation.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error updating consultation.");
+        }
+    }
+</script>
 }

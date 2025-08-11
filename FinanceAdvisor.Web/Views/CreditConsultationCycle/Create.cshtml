@@ -18,25 +18,7 @@
 <h2>Create Credit Consultation Cycle</h2>
 
 <form asp-action="Create" method="post">
-
-    @if (isUser)
-    {
-        <input type="hidden" asp-for="ClientId" value="@clientId" />
-        <div class="form-group mb-3">
-            <label asp-for="AdvisorId" class="form-label"></label>
-            <input asp-for="AdvisorId" class="form-control" />
-            <span asp-validation-for="AdvisorId" class="text-danger"></span>
-        </div>
-    }
-    else if (isAdvisor)
-    {
-        <input type="hidden" asp-for="AdvisorId" value="@advisorId" />
-        <div class="form-group mb-3">
-            <label asp-for="ClientId" class="form-label"></label>
-            <input asp-for="ClientId" class="form-control" />
-            <span asp-validation-for="ClientId" class="text-danger"></span>
-        </div>
-    }
+    @Html.AntiForgeryToken();
 
     <div class="form-group mb-3">
         <label asp-for="CreditType" class="form-label"></label>
@@ -45,6 +27,31 @@
         </select>
         <span asp-validation-for="CreditType" class="text-danger"></span>
     </div>
+
+    @if (!isUser)
+    {
+        <div class="form-group mb-3">
+            <label asp-for="ClientId" class="form-label">Client</label>
+            <select asp-for="ClientId" class="form-control"
+                    asp-items="@(new SelectList(Model.ChooseUsers, "Id", "UserName"))">
+                <option value="">-- Select a Client --</option>
+            </select>
+            <span asp-validation-for="ClientId" class="text-danger"></span>
+        </div>
+        <input type="hidden" name="AdvisorId" value="@advisorId" />
+    }
+    else
+    {
+        <div class="form-group mb-3">
+            <label asp-for="AdvisorId" class="form-label">Advisor</label>
+            <select asp-for="AdvisorId" class="form-control"
+                    asp-items="@(new SelectList(Model.ChooseAdvisors, "AdvisorId", "AdvisorName"))">
+                <option value="">-- Select an Advisor --</option>
+            </select>
+            <span asp-validation-for="AdvisorId" class="text-danger"></span>
+        </div>
+        <input type="hidden" name="ClientId" value="@clientId" />
+    }
 
     <button type="submit" class="btn btn-primary">Create</button>
     <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>

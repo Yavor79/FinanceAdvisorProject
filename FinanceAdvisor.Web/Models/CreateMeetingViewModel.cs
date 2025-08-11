@@ -1,8 +1,11 @@
-
-public class CreateMeetingViewModel
+namespace FinanceAdvisor.Web.Models
 {
-    public Guid CreditConsultationCycleId { get; set; }
-    public DateTime Date { get; set; }
-    public string? Topic { get; set; }
-    public string? Notes { get; set; }
+    public class CreateMeetingViewModel
+    {
+        public Guid CreditConsultationCycleId { get; set; }
+        public DateTime Date { get; set; }
+        public FinanceAdvisor.Domain.Enums.Type Type { get; set; }
+        public string? Topic { get; set; }
+        public string? Notes { get; set; }
+    }
 }

@@ -25,35 +25,68 @@
                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                         <ul class="navbar-nav flex-grow-1">
 
-
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="InvestmentAdvisory">
-                                    Investment Consultations
-                                </a>
-                            </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="CreditAdvisory">
-                                    Credit Consultations
-                                </a>
-                            </li>
+                            @if (User.Claims.Any(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && (c.Value == "Advisor"))
+                                && User.Claims.Any(c => c.Type == "advisor_specialization" && (c.Value != null)))
+                            {
+                                var advisorSpecialization = User.Claims.FirstOrDefault(c => c.Type == "advisor_specialization")?.Value;
+                                switch (advisorSpecialization)
+                                {
+                                    case "Investment":
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="InvestmentAdvisory">
+                                                Investment Consultations
+                                            </a>
+                                        </li>
+                                        break;
 
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="SecurityAdvisory">
-                                    Security Consultations
-                                </a>
-                            </li>
+                                    case "Credit":
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="CreditAdvisory">
+                                                Credit Consultations
+                                            </a>
+                                        </li>
+                                        break;
+
+                                    case "Security":
+                                        <li class="nav-item">
+                                            <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="SecurityAdvisory">
+                                                Security Consultations
+                                            </a>
+                                        </li>
+                                        break;
+                                    default: break;
+                                }
+                            }
+                            else
+                            {
+                                
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="InvestmentAdvisory">
+                                        Investment Consultations
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="CreditAdvisory">
+                                        Credit Consultations
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Consultation" asp-action="Index" asp-route-filter="SecurityAdvisory">
+                                        Security Consultations
+                                    </a>
+                                </li>
+                            }
 
 
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="CreditConsultationCycle" asp-action="Index">Credit Cycles</a>
                             </li>
-
-
-
 
                         </ul>
 

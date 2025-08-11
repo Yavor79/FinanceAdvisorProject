@@ -59,6 +59,12 @@ namespace FinanceAdvisor.Web.Helpers
             return expiry < DateTime.UtcNow;
         }
 
+        public async Task<string?> GetAccessTokenAsync()
+        {
+            var context = _httpContextAccessor.HttpContext;
+            var accessToken = await context.GetTokenAsync("access_token");
+            return accessToken;
+        }
         
     }
 }

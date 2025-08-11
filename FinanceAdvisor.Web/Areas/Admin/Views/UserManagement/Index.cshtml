@@ -39,6 +39,7 @@
                         <form action="/Admin/UserManagement/Delete"
                               method="post"
                               class="d-inline">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@user.Id" />
 
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
@@ -52,6 +53,7 @@
                         <form action="/Admin/UserManagement/Restore"
                               method="post"
                               class="d-inline">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@user.Id" />
 
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Restore</button>
@@ -62,6 +64,7 @@
                 
                 <td>
                     <form method="post" action="/Admin/UserManagement/UpdateRole">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@user.Id" />
                         <select name="role" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Roles>()">
                         </select>

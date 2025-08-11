@@ -40,7 +40,7 @@ namespace FinanceAdvisor
             builder.Services.AddDbContext<FinanceDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-          
+
 
             // no Identity here -> users log in the Identity Server !!!
 
@@ -48,11 +48,12 @@ namespace FinanceAdvisor
             {
                 options.AddPolicy("AllowMVC", policy =>
                 {
-                    policy.WithOrigins("https://localhost:7053;http://localhost:5024") 
+                    policy.WithOrigins("https://localhost:7053", "http://localhost:5024")
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
             });
+
 
 
             builder.Services.AddAuthentication("Bearer")
@@ -126,11 +127,11 @@ namespace FinanceAdvisor
                 //var consultationCycleSeeder = new CreditConsultationCycleSeeder();
                 //await consultationCycleSeeder.SeedAsync(services);
 
-                var consultationSeeder = new ConsultationSeeder();
-                await consultationSeeder.SeedAsync(services);
+                //var consultationSeeder = new ConsultationSeeder();
+                //await consultationSeeder.SeedAsync(services);
 
-                var meetingSeeder = new MeetingSeeder();
-                await meetingSeeder.SeedAsync(services);
+                //var meetingSeeder = new MeetingSeeder();
+                //await meetingSeeder.SeedAsync(services);
             }
 
 

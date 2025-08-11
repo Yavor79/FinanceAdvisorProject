@@ -9,5 +9,7 @@ namespace FinanceAdvisor.Application.DTOs
         public Specialization Specialization { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
+
+        public string AdvisorName { get; set; } = string.Empty;
     }
 }

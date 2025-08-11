@@ -18,6 +18,10 @@ namespace FinanceAdvisor.Web.Models
 
         [Required]
         public ConsultationType ConsultationType { get; set; }
+
+        public IEnumerable<ChooseAdvisorViewModel> ChooseAdvisors { get; set; } = Enumerable.Empty<ChooseAdvisorViewModel>();
+        public IEnumerable<ChooseUserViewModel> ChooseUsers { get; set; } = Enumerable.Empty<ChooseUserViewModel>();
+
     }
 
 }

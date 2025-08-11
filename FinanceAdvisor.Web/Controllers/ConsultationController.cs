@@ -25,6 +25,32 @@ namespace FinanceAdvisor.Web.Controllers
         {
             _logger = logger;
         }
+
+        private void LogObjectProperties<T>(string context, IEnumerable<T>? collection)
+        {
+            if (collection == null)
+            {
+                Console.WriteLine($"=== {context} collection is null ===");
+                return;
+            }
+
+            Console.WriteLine($"=== {context} collection logging start ({collection.Count()} items) ===");
+
+            int index = 1;
+            foreach (var item in collection)
+            {
+                Console.WriteLine($"--- Item {index} ---");
+                foreach (var prop in item.GetType().GetProperties())
+                {
+                    var value = prop.GetValue(item, null);
+                    Console.WriteLine($"{prop.Name}: {value}");
+                }
+                index++;
+            }
+
+            Console.WriteLine($"=== {context} collection logging end ===");
+        }
+
         public static void Log(CreateConsultationViewModel vm)
         {
             Console.WriteLine("=== CreateConsultationViewModel Log ===");
@@ -79,6 +105,7 @@ namespace FinanceAdvisor.Web.Controllers
                     var viewModels = _mapper.Map<IEnumerable<ConsultationViewModel>>(dtos);
 
                     ViewBag.Filter = filter;
+                    ViewBag.AccessToken = await _tokenService.GetAccessTokenAsync();
                     return View(viewModels);
                 }
                 if (isClient && clientId != Guid.Empty)
@@ -99,10 +126,12 @@ namespace FinanceAdvisor.Web.Controllers
                     var viewModels = _mapper.Map<IEnumerable<ConsultationViewModel>>(dtos);
 
                     ViewBag.Filter = filter;
+                    ViewBag.AccessToken = _tokenService.GetAccessTokenAsync();
                     return View(viewModels);
                 }
 
                 ViewBag.Filter = filter;
+                ViewBag.AccessToken = _tokenService.GetAccessTokenAsync();
                 IEnumerable<ConsultationViewModel> e = new List<ConsultationViewModel>();
                 
                 return View(e);
@@ -131,17 +160,75 @@ namespace FinanceAdvisor.Web.Controllers
             return View(vm);
         }
 
-        [HttpGet]
-        public IActionResult Create(ConsultationType filter)
+        
+        private Specialization ConvertToSpecialization(ConsultationType type)
         {
+            return type switch
+            {
+                ConsultationType.CreditAdvisory => Specialization.Credit,
+                ConsultationType.InvestmentAdvisory => Specialization.Investment,
+                ConsultationType.SecurityAdvisory => Specialization.Security,
+                _ => throw new ArgumentOutOfRangeException(nameof(type), $"Unsupported consultation type: {type}")
+            };
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Create(ConsultationType filter)
+        {
+            var isAdvisor = User.Claims.Any(c =>
+                    c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "Advisor");
+
+            var isClient = User.Claims.Any(c =>
+                c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" && c.Value == "User");
+
             var model = new CreateConsultationViewModel();
 
             model.ConsultationType = filter;
-            Console.WriteLine("//////////////"+filter.ToString());
+
+            var specialization = ConvertToSpecialization(filter);
+
+            if (isClient)
+            {
+                var response = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/specialization/{specialization}", _tokenService);
+                var checkResult = await RunChecks(response);
+                if (checkResult != null) return checkResult;
+
+                if (!response.IsSuccessStatusCode)
+                    return View("Error", $"API Error: {response.StatusCode}");
+
+
+                var dto = await response.Content.ReadFromJsonAsync<IEnumerable<AdvisorDto>>();
+                if (dto == null)
+                {
+                    return View(model);
+                }
+                var vm = _mapper.Map<IEnumerable<ChooseAdvisorViewModel>>(dto);
+                model.ChooseAdvisors = vm;
+            }
+            else if (isAdvisor)
+            {
+                var response = await _identityServerHttpClient.GetWithRefreshAsync("/api/admin/users/usersOnly", _tokenService);
+                var checkResult = await RunChecks(response);
+                if (checkResult != null) return checkResult;
+
+                if (!response.IsSuccessStatusCode)
+                    return View("Error", $"API Error: {response.StatusCode}");
+
+
+                var dto = await response.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
+                LogObjectProperties("ApplicationUserDto", dto);
+                if (dto == null)
+                {
+                    return View(model);
+                }
+                var vm = _mapper.Map<IEnumerable<ChooseUserViewModel>>(dto);
+                LogObjectProperties("ChooseUserViewModel", vm);
+                model.ChooseUsers = vm;
+            }
 
             return View(model);
         }
-
 
 
         [HttpPost]
@@ -163,9 +250,9 @@ namespace FinanceAdvisor.Web.Controllers
 
             var filter = model.ConsultationType switch
             {
-                ConsultationType.CreditAdvisory => "Credit",
-                ConsultationType.InvestmentAdvisory => "Investment",
-                ConsultationType.SecurityAdvisory => "Security",
+                ConsultationType.CreditAdvisory => "CreditAdvisory",
+                ConsultationType.InvestmentAdvisory => "InvestmentAdvisory",
+                ConsultationType.SecurityAdvisory => "SecurityAdvisory",
                 _ => null
             };
 
@@ -186,6 +273,7 @@ namespace FinanceAdvisor.Web.Controllers
             var dto = await response.Content.ReadFromJsonAsync<ConsultationDto>();
             var vm = _mapper.Map<UpdateConsultationViewModel>(dto);
 
+            
             return View(vm);
         }
 
@@ -208,6 +296,27 @@ namespace FinanceAdvisor.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //public static string ToConsultationTypeString(string advisorSpecialization)
+        //{
+        //    if (string.IsNullOrWhiteSpace(advisorSpecialization))
+        //        return string.Empty;
+
+        //    switch (advisorSpecialization.Trim())
+        //    {
+        //        case "InvestmentAdvisory":
+        //            return "Investment";
+
+        //        case "CreditAdvisory":
+        //            return "Credit";
+
+        //        case "SecurityAdvisory":
+        //            return "Security";
+
+        //        default:
+        //            return string.Empty; // or throw new ArgumentException("Unknown specialization")
+        //    }
+        //}
+
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, Guid advisorId)
         {
@@ -218,8 +327,10 @@ namespace FinanceAdvisor.Web.Controllers
 
             if (!response.IsSuccessStatusCode)
                 return View("Error", $"API Error: {response.StatusCode}");
-
-            return RedirectToAction(nameof(Index));
+            var advisor_specialization = User.Claims.First(c => c.Type == "advisor_specialization").Value;
+            
+            Console.WriteLine($"Consultation:{advisor_specialization}");
+            return Redirect($"https://localhost:7053/Consultation?filter={advisor_specialization}");
         }
 
         public async Task<IActionResult> CountByClient(Guid clientId)

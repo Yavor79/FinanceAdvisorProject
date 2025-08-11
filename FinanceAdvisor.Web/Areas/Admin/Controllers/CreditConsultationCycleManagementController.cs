@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
 using FinanceAdvisor.Web.Models;
@@ -21,6 +22,47 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             _logger = logger;
         }
 
+        private void LogSingleObjectProperties<T>(string context, T? collection)
+        {
+            if (collection == null)
+            {
+                Console.WriteLine($"=== {context} collection is null ===");
+                return;
+            }
+
+            foreach (var prop in collection.GetType().GetProperties())
+            {
+                var value = prop.GetValue(collection, null);
+                Console.WriteLine($"{prop.Name}: {value}");
+            }
+               
+            Console.WriteLine($"=== {context} collection logging end ===");
+        }
+
+        private void LogObjectProperties<T>(string context, IEnumerable<T>? collection)
+        {
+            if (collection == null)
+            {
+                Console.WriteLine($"=== {context} collection is null ===");
+                return;
+            }
+
+            Console.WriteLine($"=== {context} collection logging start ({collection.Count()} items) ===");
+
+            int index = 1;
+            foreach (var item in collection)
+            {
+                Console.WriteLine($"--- Item {index} ---");
+                foreach (var prop in item.GetType().GetProperties())
+                {
+                    var value = prop.GetValue(item, null);
+                    Console.WriteLine($"{prop.Name}: {value}");
+                }
+                index++;
+            }
+
+            Console.WriteLine($"=== {context} collection logging end ===");
+        }
 
         public async Task<IActionResult> Index()
         {
@@ -90,9 +132,47 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new CreateCreditConsultationCycleViewModel());
+            var model = new CreateCreditConsultationCycleViewModel();
+
+            var specialization = Specialization.Credit;
+           
+            var response = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/specialization/{specialization}", _tokenService);
+            var checkResult = await RunChecks(response);
+            if (checkResult != null) return checkResult;
+
+            if (!response.IsSuccessStatusCode)
+                return View("Error", $"API Error: {response.StatusCode}");
+
+
+            var dto = await response.Content.ReadFromJsonAsync<IEnumerable<AdvisorDto>>();
+            if (dto == null)
+            {
+                return View(model);
+            }
+            var vm = _mapper.Map<IEnumerable<ChooseAdvisorViewModel>>(dto);
+            model.ChooseAdvisors = vm;
+
+            var response2 = await _identityServerHttpClient.GetWithRefreshAsync("/api/admin/users/usersOnly", _tokenService);
+            var checkResult2 = await RunChecks(response2);
+            if (checkResult2 != null) return checkResult2;
+
+            if (!response2.IsSuccessStatusCode)
+                return View("Error", $"API Error: {response2.StatusCode}");
+
+
+            var dto2 = await response2.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
+            LogObjectProperties("ApplicationUserDto", dto2);
+            if (dto2 == null)
+            {
+                return View(model);
+            }
+            var vm2 = _mapper.Map<IEnumerable<ChooseUserViewModel>>(dto2);
+            LogObjectProperties("ChooseUserViewModel", vm2);
+            model.ChooseUsers = vm2;
+
+            return View(model);
         }
 
         [HttpPost]
@@ -119,8 +199,27 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
                 return checkResult;
 
             var dto = await response.Content.ReadFromJsonAsync<CreditConsultationCycleDto>();
+            LogSingleObjectProperties("CreditConsultationCycleDto", dto);
             var viewModel = _mapper.Map<UpdateCreditConsultationCycleViewModel>(dto);
+            LogSingleObjectProperties("UpdateCreditConsultationCycleViewModel", viewModel);
+            var specialization = Specialization.Credit;
 
+            var response2 = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/specialization/{specialization}", _tokenService);
+            var checkResult2 = await RunChecks(response2);
+            if (checkResult2 != null) return checkResult2;
+
+            if (!response2.IsSuccessStatusCode)
+                return View("Error", $"API Error: {response2.StatusCode}");
+
+
+            var dto2 = await response2.Content.ReadFromJsonAsync<IEnumerable<AdvisorDto>>();
+            if (dto2 == null)
+            {
+                return View(viewModel);
+            }
+            var vm = _mapper.Map<IEnumerable<ChooseAdvisorViewModel>>(dto2);
+            viewModel.ChooseAdvisors = vm;
+            LogSingleObjectProperties("UpdateCreditConsultationCycleViewModel", viewModel);
             return View(viewModel);
         }
 

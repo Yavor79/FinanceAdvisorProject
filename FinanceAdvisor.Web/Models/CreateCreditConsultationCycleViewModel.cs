@@ -14,6 +14,9 @@ namespace FinanceAdvisor.Web.Models
 
         [Required]
         public CreditType CreditType { get; set; }
+
+        public IEnumerable<ChooseAdvisorViewModel> ChooseAdvisors { get; set; } = Enumerable.Empty<ChooseAdvisorViewModel>();
+        public IEnumerable<ChooseUserViewModel> ChooseUsers { get; set; } = Enumerable.Empty<ChooseUserViewModel>();
     }
 
 }

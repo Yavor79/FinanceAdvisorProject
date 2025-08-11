@@ -4,33 +4,75 @@ using FinanceAdvisor.Application.IRepos;
 using FinanceAdvisor.Domain.Entities;
 using FinanceAdvisor.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace FinanceAdvisor.Application.Services
 {
     public class AdvisorService : IAdvisorService
     {
         private readonly IAdvisorRepository _repo;
+        private readonly IApplicationUserRepository _userRepo;
 
-        public AdvisorService(IAdvisorRepository repo)
+        public AdvisorService(IAdvisorRepository repo, IApplicationUserRepository userRepo)
         {
             _repo = repo;
+            _userRepo = userRepo;
+        }
+
+        public static class DtoLogger
+        {
+            public static void LogDto<T>(T dto, string prefix = "")
+            {
+                if (dto == null)
+                {
+                    Console.WriteLine($"{prefix}DTO is null");
+                    return;
+                }
+
+                var type = typeof(T);
+                Console.WriteLine($"{prefix}Logging DTO: {type.Name}");
+
+                foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    var value = prop.GetValue(dto) ?? "null";
+                    Console.WriteLine($"{prefix}{prop.Name}: {value}");
+                }
+
+                Console.WriteLine($"{prefix}--- End of DTO ---");
+            }
+        }
+
+        private async Task<string> GetNameByIdAsync(Guid id)
+        {
+            var advisor = await _repo.GetByIdAsync(id, true);
+            var user = await _userRepo.GetByIdAsync(advisor.UserId);
+            return user.Email;
         }
 
         public async Task<IEnumerable<AdvisorDto>> GetAllAsync()
         {
-            var advisors = await _repo.GetAllAttached()
-            .Where(a => !a.IsDeleted)
+            var advisors = await _repo.GetAllAttached(true)
             .ToListAsync();
 
-            return advisors.Select(a => new AdvisorDto
-            {
-                AdvisorId = a.AdvisorId,
-                UserId = a.UserId,
-                Specialization = a.Specialization,
-                CreatedAt = a.CreatedAt,
-                IsDeleted = a.IsDeleted
-            });
 
+            var advisorDtos = new List<AdvisorDto>();
+
+            foreach (var a in advisors)
+            {
+                var advisorName = await GetNameByIdAsync(a.AdvisorId);
+
+                advisorDtos.Add(new AdvisorDto
+                {
+                    AdvisorId = a.AdvisorId,
+                    AdvisorName = advisorName,
+                    UserId = a.UserId,
+                    Specialization = a.Specialization,
+                    CreatedAt = a.CreatedAt,
+                    IsDeleted = a.IsDeleted
+                });
+            }
+
+            return advisorDtos;
         }
 
         public async Task<AdvisorDto?> GetByIdAsync(Guid id)
@@ -66,14 +108,29 @@ namespace FinanceAdvisor.Application.Services
                 .Where(u => specialization == u.Specialization)
                 .ToListAsync();
 
-            return advisors.Select(a => new AdvisorDto
+            var advisorDtos = new List<AdvisorDto>();
+
+            foreach (var a in advisors)
             {
-                AdvisorId = a.AdvisorId,
-                UserId = a.UserId,
-                Specialization = a.Specialization,
-                CreatedAt = a.CreatedAt,
-                IsDeleted = a.IsDeleted
-            });
+                var advisorName = await GetNameByIdAsync(a.AdvisorId);
+
+                var dto = new AdvisorDto
+                {
+                    AdvisorId = a.AdvisorId,
+                    AdvisorName = advisorName,
+                    UserId = a.UserId,
+                    Specialization = a.Specialization,
+                    CreatedAt = a.CreatedAt,
+                    IsDeleted = a.IsDeleted
+                };
+
+                // Log the DTO
+                DtoLogger.LogDto(dto, "[AdvisorService] ");
+
+                advisorDtos.Add(dto);
+            }
+
+            return advisorDtos;
         }
 
         public async Task CreateAsync(AdvisorDto dto)
@@ -113,7 +170,8 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<bool> RestoreAsync(Guid id)
         {
-            var user = await _repo.GetByIdAsync(id);
+            var user = await _repo.GetByIdAsync(id, true);
+            Console.WriteLine($"user{user}");
             if (user == null || !user.IsDeleted) return false;
 
             user.IsDeleted = false;

@@ -10,8 +10,8 @@ namespace FinanceAdvisor.Web.Models
         public Guid Id { get; set; }
 
 
-        [Required]
-        public Guid ClientId { get; set; }
+        //[Required]
+        //public Guid ClientId { get; set; }
 
         [Required]
         public Guid AdvisorId { get; set; }
@@ -24,7 +24,10 @@ namespace FinanceAdvisor.Web.Models
         [Required]
         public ConsultationType ConsultationType { get; set; }
 
+        public string AdvisorName { get; set; } = string.Empty;
 
+        public IEnumerable<ChooseAdvisorViewModel> ChooseAdvisors { get; set; } = Enumerable.Empty<ChooseAdvisorViewModel>();
+        
 
     }
 }
