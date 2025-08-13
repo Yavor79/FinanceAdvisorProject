@@ -2,11 +2,13 @@
 using FinanceAdvisor.Infrastructure.Seed.DataTransferObjects;
 using System;
 using FinanceAdvisor.Infrastructure.Seed.Seeders;
+using FinanceAdvisor.Common.Utilities;
 
 public class MeetingSeeder : BaseSeeder<Meeting, ImportMeetingDto>
 {
-    protected override string JsonFilePath =>
-        @"C:\Users\USER\Programming\C_Sharp\Finance_Project\FinanceAdvisor\FinanceAdvisor.Infrastructure\Seed\seedData\application-meeting.json";
+    protected override string JsonFilePath
+            => FileLocator.FindJsonFile("application-meeting.json")
+               ?? throw new FileNotFoundException("Seed file 'application-meeting.json' not found.");
 
     protected override bool EntityExists(Meeting existingEntity, ImportMeetingDto newDto)
     {
