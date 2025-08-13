@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Common.Logging;
 using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
@@ -22,47 +23,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             _logger = logger;
         }
 
-        private void LogSingleObjectProperties<T>(string context, T? collection)
-        {
-            if (collection == null)
-            {
-                Console.WriteLine($"=== {context} collection is null ===");
-                return;
-            }
-
-            foreach (var prop in collection.GetType().GetProperties())
-            {
-                var value = prop.GetValue(collection, null);
-                Console.WriteLine($"{prop.Name}: {value}");
-            }
-               
-            Console.WriteLine($"=== {context} collection logging end ===");
-        }
-
-        private void LogObjectProperties<T>(string context, IEnumerable<T>? collection)
-        {
-            if (collection == null)
-            {
-                Console.WriteLine($"=== {context} collection is null ===");
-                return;
-            }
-
-            Console.WriteLine($"=== {context} collection logging start ({collection.Count()} items) ===");
-
-            int index = 1;
-            foreach (var item in collection)
-            {
-                Console.WriteLine($"--- Item {index} ---");
-                foreach (var prop in item.GetType().GetProperties())
-                {
-                    var value = prop.GetValue(item, null);
-                    Console.WriteLine($"{prop.Name}: {value}");
-                }
-                index++;
-            }
-
-            Console.WriteLine($"=== {context} collection logging end ===");
-        }
+        
 
         public async Task<IActionResult> Index()
         {
@@ -163,13 +124,13 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
 
 
             var dto2 = await response2.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
-            LogObjectProperties("ApplicationUserDto", dto2);
+            _logger.LogCollectionProperties(dto2, "[CreditConsultationCycleManagementController]");
             if (dto2 == null)
             {
                 return View(model);
             }
             var vm2 = _mapper.Map<IEnumerable<ChooseUserViewModel>>(dto2);
-            LogObjectProperties("ChooseUserViewModel", vm2);
+            _logger.LogCollectionProperties(vm2, "[CreditConsultationCycleManagementController]");
             model.ChooseUsers = vm2;
 
             return View(model);
@@ -199,9 +160,9 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
                 return checkResult;
 
             var dto = await response.Content.ReadFromJsonAsync<CreditConsultationCycleDto>();
-            LogSingleObjectProperties("CreditConsultationCycleDto", dto);
+            _logger.LogObjectProperties(dto, "[CreditConsultationCycleManagementController]");
             var viewModel = _mapper.Map<UpdateCreditConsultationCycleViewModel>(dto);
-            LogSingleObjectProperties("UpdateCreditConsultationCycleViewModel", viewModel);
+            _logger.LogObjectProperties(viewModel, "[CreditConsultationCycleManagementController]");
             var specialization = Specialization.Credit;
 
             var response2 = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/specialization/{specialization}", _tokenService);
@@ -219,7 +180,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             }
             var vm = _mapper.Map<IEnumerable<ChooseAdvisorViewModel>>(dto2);
             viewModel.ChooseAdvisors = vm;
-            LogSingleObjectProperties("UpdateCreditConsultationCycleViewModel", viewModel);
+            _logger.LogObjectProperties(viewModel, "[CreditConsultationCycleManagementController]");
             return View(viewModel);
         }
 

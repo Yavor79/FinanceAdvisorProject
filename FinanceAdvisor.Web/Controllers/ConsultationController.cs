@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Azure;
+
 using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Common.Logging;
 using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Web.Controllers;
 using FinanceAdvisor.Web.Helpers;
@@ -26,53 +27,7 @@ namespace FinanceAdvisor.Web.Controllers
             _logger = logger;
         }
 
-        private void LogObjectProperties<T>(string context, IEnumerable<T>? collection)
-        {
-            if (collection == null)
-            {
-                Console.WriteLine($"=== {context} collection is null ===");
-                return;
-            }
-
-            Console.WriteLine($"=== {context} collection logging start ({collection.Count()} items) ===");
-
-            int index = 1;
-            foreach (var item in collection)
-            {
-                Console.WriteLine($"--- Item {index} ---");
-                foreach (var prop in item.GetType().GetProperties())
-                {
-                    var value = prop.GetValue(item, null);
-                    Console.WriteLine($"{prop.Name}: {value}");
-                }
-                index++;
-            }
-
-            Console.WriteLine($"=== {context} collection logging end ===");
-        }
-
-        public static void Log(CreateConsultationViewModel vm)
-        {
-            Console.WriteLine("=== CreateConsultationViewModel Log ===");
-            Console.WriteLine($"ClientId: {vm.ClientId}");
-            Console.WriteLine($"AdvisorId: {vm.AdvisorId}");
-            Console.WriteLine($"ScheduledAt: {vm.ScheduledDateTime}");
-            Console.WriteLine($"ConsultationType: {vm.ConsultationType}");
-            Console.WriteLine("========================================");
-        }
-        private void LogConsultationDto(string context, object dto)
-        {
-            Console.WriteLine($"=== {context} DTO Logging Start ===");
-
-            foreach (var prop in dto.GetType().GetProperties())
-            {
-                var value = prop.GetValue(dto, null);
-                Console.WriteLine($"{prop.Name}: {value}");
-            }
-
-            Console.WriteLine($"=== {context} DTO Logging End ===");
-        }
-
+       
         [AllowAnonymous]
         public async Task<IActionResult> Index(string filter)
         {
@@ -217,13 +172,13 @@ namespace FinanceAdvisor.Web.Controllers
 
 
                 var dto = await response.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
-                LogObjectProperties("ApplicationUserDto", dto);
+                _logger.LogCollectionProperties(dto, "[ConsultationController]");
                 if (dto == null)
                 {
                     return View(model);
                 }
                 var vm = _mapper.Map<IEnumerable<ChooseUserViewModel>>(dto);
-                LogObjectProperties("ChooseUserViewModel", vm);
+                _logger.LogCollectionProperties(vm, "[ConsultationController]");
                 model.ChooseUsers = vm;
             }
 
@@ -237,9 +192,9 @@ namespace FinanceAdvisor.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            Log(model);
+            _logger.LogObjectProperties(model, "[ConsultationController]");
             var dto = _mapper.Map<CreateConsultationDto>(model);
-            LogConsultationDto("Create", dto);
+            _logger.LogObjectProperties(dto, "[ConsultationController]");
             var response = await _httpClient.PostAsJsonWithRefreshAsync("/api/v1/Consultations", dto, _tokenService);
 
             var checkResult = await RunChecks(response);
@@ -296,27 +251,7 @@ namespace FinanceAdvisor.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //public static string ToConsultationTypeString(string advisorSpecialization)
-        //{
-        //    if (string.IsNullOrWhiteSpace(advisorSpecialization))
-        //        return string.Empty;
-
-        //    switch (advisorSpecialization.Trim())
-        //    {
-        //        case "InvestmentAdvisory":
-        //            return "Investment";
-
-        //        case "CreditAdvisory":
-        //            return "Credit";
-
-        //        case "SecurityAdvisory":
-        //            return "Security";
-
-        //        default:
-        //            return string.Empty; // or throw new ArgumentException("Unknown specialization")
-        //    }
-        //}
-
+        
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id, Guid advisorId)
         {

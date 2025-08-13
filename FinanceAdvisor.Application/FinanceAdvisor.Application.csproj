@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FinanceAdvisor.Common\FinanceAdvisor.Common.csproj" />
     <ProjectReference Include="..\FinanceAdvisor.Domain\FinanceAdvisor.Domain.csproj" />
     
   </ItemGroup>

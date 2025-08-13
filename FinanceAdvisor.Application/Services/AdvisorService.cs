@@ -6,41 +6,27 @@ using FinanceAdvisor.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
+using FinanceAdvisor.Common.Logging;
+using Microsoft.Extensions.Logging;
+
 namespace FinanceAdvisor.Application.Services
 {
     public class AdvisorService : IAdvisorService
     {
         private readonly IAdvisorRepository _repo;
         private readonly IApplicationUserRepository _userRepo;
+        private readonly ILogger<AdvisorService> _logger;
 
-        public AdvisorService(IAdvisorRepository repo, IApplicationUserRepository userRepo)
+        public AdvisorService(
+            IAdvisorRepository repo,
+            IApplicationUserRepository userRepo,
+            ILogger<AdvisorService> logger)
         {
             _repo = repo;
             _userRepo = userRepo;
+            _logger = logger;
         }
 
-        public static class DtoLogger
-        {
-            public static void LogDto<T>(T dto, string prefix = "")
-            {
-                if (dto == null)
-                {
-                    Console.WriteLine($"{prefix}DTO is null");
-                    return;
-                }
-
-                var type = typeof(T);
-                Console.WriteLine($"{prefix}Logging DTO: {type.Name}");
-
-                foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    var value = prop.GetValue(dto) ?? "null";
-                    Console.WriteLine($"{prefix}{prop.Name}: {value}");
-                }
-
-                Console.WriteLine($"{prefix}--- End of DTO ---");
-            }
-        }
 
         private async Task<string> GetNameByIdAsync(Guid id)
         {
@@ -125,7 +111,7 @@ namespace FinanceAdvisor.Application.Services
                 };
 
                 // Log the DTO
-                DtoLogger.LogDto(dto, "[AdvisorService] ");
+                _logger.LogDto(dto, "[AdvisorService]");
 
                 advisorDtos.Add(dto);
             }

@@ -1,4 +1,5 @@
 ﻿using FinanceAdvisor.Application.DTOs;
+using FinanceAdvisor.Common.Logging;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -15,34 +16,15 @@ namespace FinanceAdvisor.Identity
     public class UserAdminController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<UserAdminController> _logger;
 
-        public UserAdminController(UserManager<User> userManager)
+        public UserAdminController(UserManager<User> userManager, ILogger<UserAdminController> logger)
         {
             _userManager = userManager;
+            _logger = logger;
         }
 
-        public static class DtoLogger
-        {
-            public static void LogDto<T>(T dto)
-            {
-                if (dto == null)
-                {
-                    Console.WriteLine("DTO is null");
-                    return;
-                }
-
-                var properties = typeof(T).GetProperties();
-                Console.WriteLine($"Logging DTO of type {typeof(T).Name}:");
-
-                foreach (var prop in properties)
-                {
-                    var value = prop.GetValue(dto);
-                    Console.WriteLine($" - {prop.Name}: {value}");
-                }
-            }
-        }
-
-
+        
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("debug-claims")]
         public IActionResult DebugClaims()
@@ -71,7 +53,7 @@ namespace FinanceAdvisor.Identity
         [HttpGet("{id}/roles")]
         public async Task<IActionResult> GetRoles(Guid id)
         {
-            Console.WriteLine("SetRole hit!!!!");
+            Console.WriteLine("GetRole hit!!!!");
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null) return NotFound();
 
@@ -95,7 +77,7 @@ namespace FinanceAdvisor.Identity
 
             foreach (var dto in usersDto)
             {
-                DtoLogger.LogDto(dto);
+                _logger.LogObjectProperties(dto, "[UserAdminController]");
             }
            
 

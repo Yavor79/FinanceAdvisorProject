@@ -24,33 +24,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             
         }
 
-        //public async Task<IActionResult> Index()
-        //{
-        //    try
-        //    {
-        //        var response = await _httpClient.GetWithRefreshAsync("/api/v1/ApplicationUsers", _tokenService);
-
-        //        var checkResult = await RunChecks(response);
-        //        if (checkResult != null)
-        //            return checkResult;
-
-        //        if (!response.IsSuccessStatusCode)
-        //            return View("Error", $"API Error: {response.StatusCode}");
-
-        //        var dtos = await response.Content.ReadFromJsonAsync<IEnumerable<ApplicationUserDto>>();
-        //        var viewModels = _mapper.Map<IEnumerable<ApplicationUserViewModel>>(dtos);
-
-        //        return View(viewModels);
-        //    }
-        //    catch
-        //    {
-        //        return View("Error", "Unable to load application users.");
-        //    }
-        //}
-
-        
-
-
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)

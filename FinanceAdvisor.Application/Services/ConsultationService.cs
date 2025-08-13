@@ -4,6 +4,9 @@ using FinanceAdvisor.Application.IRepos;
 using Microsoft.EntityFrameworkCore;
 using FinanceAdvisor.Domain.Enums;
 using FinanceAdvisor.Domain.Entities;
+using Microsoft.Extensions.Logging;
+
+using FinanceAdvisor.Common.Logging;
 
 
 namespace FinanceAdvisor.Application.Services
@@ -13,8 +16,10 @@ namespace FinanceAdvisor.Application.Services
         private readonly IConsultationRepository _repository;
         private readonly IApplicationUserRepository _userRepository;
         private readonly IAdvisorRepository _advisorRepository;
-        public ConsultationService(IConsultationRepository repository, IApplicationUserRepository applicationUserRepository, IAdvisorRepository advisorRepository)
+        private readonly ILogger<ConsultationService> _logger;
+        public ConsultationService(IConsultationRepository repository, IApplicationUserRepository applicationUserRepository, IAdvisorRepository advisorRepository, ILogger<ConsultationService> logger)
         {
+            _logger = logger;
             _repository = repository;
             _userRepository = applicationUserRepository;
             _advisorRepository = advisorRepository;
@@ -23,7 +28,7 @@ namespace FinanceAdvisor.Application.Services
         private async Task<ConsultationDto> SetClientAndAdvisorNameInDTO(ConsultationDto cycle)
         {
 
-            PrintConsultationDto(cycle);
+            _logger.LogDto(cycle, "[ConsultationService]");
             var user = await _userRepository.GetByIdAsync(cycle.ClientId);
             var userEmail = user?.Email;
 
@@ -50,7 +55,7 @@ namespace FinanceAdvisor.Application.Services
 
             foreach (ConsultationDto cycle in consultations)
             {
-                PrintConsultationDto(cycle);
+                _logger.LogDto(cycle, "[ConsultationService]");
                 var user = await _userRepository.GetByIdAsync(cycle.ClientId);
                 var userEmail = user?.Email;
 
@@ -71,34 +76,7 @@ namespace FinanceAdvisor.Application.Services
             return consultations;
         }
 
-        public static void PrintConsultationDto(ConsultationDto dto, string context = "ConsultationDto")
-        {
-            Console.WriteLine($"===== {context} =====");
-            Console.WriteLine($"ConsultationId     : {dto.ConsultationId}");
-            Console.WriteLine($"ClientId           : {dto.ClientId}");
-            Console.WriteLine($"ClientName         : {dto.ClientName}");
-            Console.WriteLine($"AdvisorId          : {dto.AdvisorId}");
-            Console.WriteLine($"AdvisorName        : {dto.AdvisorName}");
-            Console.WriteLine($"ScheduledDateTime  : {dto.ScheduledDateTime}");
-            Console.WriteLine($"Status             : {dto.Status}");
-            Console.WriteLine($"ConsultationType   : {dto.ConsultationType}");
-            Console.WriteLine($"CreatedAt          : {dto.CreatedAt}");
-            Console.WriteLine("=============================\n");
-        }
-
-        private void LogConsultationDto(string context, object dto)
-        {
-            Console.WriteLine($"=== {context} DTO Logging Start ===");
-
-            foreach (var prop in dto.GetType().GetProperties())
-            {
-                var value = prop.GetValue(dto, null);
-                Console.WriteLine($"{prop.Name}: {value}");
-            }
-
-            Console.WriteLine($"=== {context} DTO Logging End ===");
-        }
-
+        
         private async Task<IEnumerable<ConsultationDto>> MapWithUserEmailsAsync(IEnumerable<Domain.Entities.Consultation> consultations)
         {
             var clientIds = consultations.Select(c => c.ClientId);
@@ -238,7 +216,7 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<ConsultationDto?> CreateAsync(CreateConsultationDto dto)
         {
-            LogConsultationDto("Create", dto);
+            _logger.LogDto(dto, "[ConsultationService]");
 
             var entity = new Domain.Entities.Consultation
             {
@@ -258,7 +236,7 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<bool> UpdateAsync(UpdateConsultationDto dto)
         {
-            LogConsultationDto("Update", dto);
+            _logger.LogDto(dto, "[ConsultationService]");
 
             var entity = await _repository.GetByIdAsync(dto.Id);
             if (entity == null) return false;
