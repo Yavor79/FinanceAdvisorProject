@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using MockQueryable;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace FinanceAdvisor.Tests.Services
 {
@@ -20,6 +21,7 @@ namespace FinanceAdvisor.Tests.Services
         private Mock<IConsultationRepository> _mockRepo;
         private Mock<IApplicationUserRepository> _mockUserRepo;
         private Mock<IAdvisorRepository> _mockAdvisorRepo;
+        private Mock<ILogger<ConsultationService>> _loggerMock;
         private ConsultationService _service;
 
         [SetUp]
@@ -28,8 +30,10 @@ namespace FinanceAdvisor.Tests.Services
             _mockRepo = new Mock<IConsultationRepository>();
             _mockUserRepo = new Mock<IApplicationUserRepository>();
             _mockAdvisorRepo = new Mock<IAdvisorRepository>();
+            _loggerMock = new Mock<ILogger<ConsultationService>>();
 
-            _service = new ConsultationService(_mockRepo.Object, _mockUserRepo.Object, _mockAdvisorRepo.Object);
+
+            _service = new ConsultationService(_mockRepo.Object, _mockUserRepo.Object, _mockAdvisorRepo.Object, _loggerMock.Object);
         }
 
         #region GetAllAsync Tests
@@ -205,7 +209,7 @@ namespace FinanceAdvisor.Tests.Services
         #region CreateAsync Tests
 
         [Test]
-        
+
         public async Task CreateAsync_CreatesAndReturnsConsultationDto()
         {
             // Arrange

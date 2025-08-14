@@ -111,7 +111,7 @@ namespace FinanceAdvisor.Application.Services
                 };
 
                 // Log the DTO
-                _logger.LogDto(dto, "[AdvisorService]");
+                _logger.LogObjectProperties(dto, "[AdvisorService]");
 
                 advisorDtos.Add(dto);
             }

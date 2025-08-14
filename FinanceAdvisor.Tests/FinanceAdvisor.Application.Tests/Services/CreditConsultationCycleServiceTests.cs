@@ -73,7 +73,7 @@ namespace FinanceAdvisor.Application.Tests.Services
         private void SetupAdvisorRepoReturnsUserId(Guid advisorId, Guid? userId)
         {
             _mockAdvisorRepository
-                .Setup(r => r.GetByIdAsync(advisorId))
+                .Setup(r => r.GetByIdAsync(advisorId, false))
                 .ReturnsAsync(userId == null ? null : new FinanceAdvisor.Domain.Entities.Advisor { AdvisorId = advisorId, UserId = userId.Value });
         }
 

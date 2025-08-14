@@ -28,7 +28,7 @@ namespace FinanceAdvisor.Application.Services
         private async Task<ConsultationDto> SetClientAndAdvisorNameInDTO(ConsultationDto cycle)
         {
 
-            _logger.LogDto(cycle, "[ConsultationService]");
+            _logger.LogObjectProperties(cycle, "[ConsultationService]");
             var user = await _userRepository.GetByIdAsync(cycle.ClientId);
             var userEmail = user?.Email;
 
@@ -55,7 +55,7 @@ namespace FinanceAdvisor.Application.Services
 
             foreach (ConsultationDto cycle in consultations)
             {
-                _logger.LogDto(cycle, "[ConsultationService]");
+                _logger.LogObjectProperties(cycle, "[ConsultationService]");
                 var user = await _userRepository.GetByIdAsync(cycle.ClientId);
                 var userEmail = user?.Email;
 
@@ -216,7 +216,7 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<ConsultationDto?> CreateAsync(CreateConsultationDto dto)
         {
-            _logger.LogDto(dto, "[ConsultationService]");
+            _logger.LogObjectProperties(dto, "[ConsultationService]");
 
             var entity = new Domain.Entities.Consultation
             {
@@ -236,7 +236,7 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<bool> UpdateAsync(UpdateConsultationDto dto)
         {
-            _logger.LogDto(dto, "[ConsultationService]");
+            _logger.LogObjectProperties(dto, "[ConsultationService]");
 
             var entity = await _repository.GetByIdAsync(dto.Id);
             if (entity == null) return false;
