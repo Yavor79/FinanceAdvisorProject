@@ -159,6 +159,8 @@ namespace FinanceAdvisor.Application.Services
 
         public async Task<bool> CreateAsync(CreateCreditConsultationCycleDto dto)
         {
+            
+
             var newCycle = new Domain.Entities.CreditConsultationCycle
             {
                 Id = Guid.NewGuid(),

@@ -43,15 +43,19 @@
                     }
 
                 </td>
-                <td>
-                    <form method="post" action="/Admin/AdvisorManagement/UpdateRole">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@advisor.UserId" />
-                        <select name="role" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Roles>()">
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-secondary mt-1">Change</button>
-                    </form>
-                </td>
+                @if(advisor.IsDeleted == false)
+                {
+                    <td>
+                        <form method="post" action="/Admin/AdvisorManagement/UpdateRole">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@advisor.UserId" />
+                            <input type="hidden" name="advisorId" value="@advisor.AdvisorId" />
+                            <select name="role" class="form-control" asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Roles>()">
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-secondary mt-1">Change</button>
+                        </form>
+                    </td>
+                }
             </tr>
         }
     </tbody>

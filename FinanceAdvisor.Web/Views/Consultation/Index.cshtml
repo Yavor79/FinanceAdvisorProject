@@ -76,12 +76,12 @@
                                     id="status-@consultation.ConsultationId"
                             asp-for="@consultation.Status"
                             asp-items="Html.GetEnumSelectList<FinanceAdvisor.Domain.Enums.Status>()">
-                                @foreach (Status s in Enum.GetValues(typeof(Status)))
-                                {
-                                        <option value="@consultation.Status">
-                                            @consultation.Status
-                                    </option>
-                                }
+                                
+                                
+                            <option value="@consultation.Status">
+                                    @consultation.Status
+                            </option>
+                                
                             </select>
                             <button class="btn btn-outline-success btn-sm"
                                     onclick="updateStatus('@consultation.ConsultationId', '@consultation.ClientId', '@consultation.AdvisorId', '@consultation.ConsultationType', '@consultation.ScheduledDateTime')">

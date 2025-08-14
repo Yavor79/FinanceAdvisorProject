@@ -57,8 +57,15 @@ namespace FinanceAdvisor.API.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] AdvisorDto dto)
         {
-            await _service.CreateAsync(dto);
-            return NoContent();
+            var result = await _service.CreateAsync(dto);
+            if(result)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return BadRequest("Advisor already exists!");
+            }
         }
 
         [Authorize(Policy = "AdminOnly")]

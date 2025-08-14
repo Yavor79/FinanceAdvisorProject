@@ -99,17 +99,22 @@ namespace FinanceAdvisor.Application.Services
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
                 throw new ArgumentException("Invalid user data");
-
-            var newUser = new Domain.Entities.ApplicationUser
+            var UserExists = await _repo.GetByIdAsync(dto.Id);
+            if(UserExists == null)
             {
-                Id = Guid.NewGuid(),
-                Email = dto.Email,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
+                var newUser = new Domain.Entities.ApplicationUser
+                {
+                    Id = Guid.NewGuid(),
+                    Email = dto.Email,
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                };
 
-            
-            return await _repo.AddAsync(newUser);
+
+                return await _repo.AddAsync(newUser);
+            }
+
+            return false;
         }
 
         

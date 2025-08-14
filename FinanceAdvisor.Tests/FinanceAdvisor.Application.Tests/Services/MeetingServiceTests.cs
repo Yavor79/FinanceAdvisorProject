@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 using MockQueryable;
+using Microsoft.Extensions.Logging;
 
 // Helper class to mock async EF queries
 
@@ -21,12 +22,15 @@ public class MeetingServiceTests
 {
     private Mock<IMeetingRepository> _repositoryMock = null!;
     private MeetingService _service = null!;
+    private Mock<ILogger<MeetingService>> _logger = null!;
 
     [SetUp]
     public void Setup()
     {
         _repositoryMock = new Mock<IMeetingRepository>();
-        _service = new MeetingService(_repositoryMock.Object);
+        _logger = new Mock<ILogger<MeetingService>>();
+        _service = new MeetingService(_repositoryMock.Object, _logger.Object);
+        
     }
 
     [Test]

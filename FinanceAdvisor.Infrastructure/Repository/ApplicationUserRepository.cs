@@ -55,7 +55,8 @@ namespace FinanceAdvisor.Infrastructure.Repository
                 UserName = user.Email,
                 NormalizedEmail = user.Email?.ToUpper(),
                 NormalizedUserName = user.Email?.ToUpper(),
-                EmailConfirmed = true // You can adjust based on your needs
+                EmailConfirmed = true, // You can adjust based on your needs
+                IsDeleted = user.IsDeleted
             };
 
             _dbContext.Users.Add(entity);
@@ -71,6 +72,7 @@ namespace FinanceAdvisor.Infrastructure.Repository
             entity.UserName = user.Email;
             entity.NormalizedEmail = user.Email?.ToUpper();
             entity.NormalizedUserName = user.Email?.ToUpper();
+            entity.IsDeleted = user.IsDeleted;
 
             _dbContext.Users.Update(entity);
             return await _dbContext.SaveChangesAsync() > 0;
@@ -91,8 +93,8 @@ namespace FinanceAdvisor.Infrastructure.Repository
             return new ApplicationUser
             {
                 Id = user.Id,
-                Email = user.Email
-                // Add more properties if needed
+                Email = user.Email,
+                IsDeleted = user.IsDeleted
             };
         }
     }

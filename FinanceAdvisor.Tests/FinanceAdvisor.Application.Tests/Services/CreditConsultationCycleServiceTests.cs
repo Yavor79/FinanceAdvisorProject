@@ -70,10 +70,10 @@ namespace FinanceAdvisor.Application.Tests.Services
                 .ReturnsAsync(email == null ? null : new FinanceAdvisor.Domain.Entities.ApplicationUser { Id = userId, Email = email });
         }
 
-        private void SetupAdvisorRepoReturnsUserId(Guid advisorId, Guid? userId)
+        private void SetupAdvisorRepoReturnsUserId(Guid advisorId, Guid? userId, bool overrideBehavior)
         {
             _mockAdvisorRepository
-                .Setup(r => r.GetByIdAsync(advisorId, false))
+                .Setup(r => r.GetByIdAsync(advisorId, overrideBehavior))
                 .ReturnsAsync(userId == null ? null : new FinanceAdvisor.Domain.Entities.Advisor { AdvisorId = advisorId, UserId = userId.Value });
         }
 
@@ -90,7 +90,7 @@ namespace FinanceAdvisor.Application.Tests.Services
             {
                 SetupUserRepoReturnsEmail(entity.ClientId, "client@example.com");
                 var advisorID = Guid.NewGuid();
-                SetupAdvisorRepoReturnsUserId(entity.AdvisorId, advisorID);
+                SetupAdvisorRepoReturnsUserId(entity.AdvisorId, advisorID, true);
                 SetupUserRepoReturnsEmail(advisorID, "advisor@example.com");
             }
 
@@ -130,7 +130,7 @@ namespace FinanceAdvisor.Application.Tests.Services
             _mockRepository.Setup(r => r.GetAllAttached()).Returns(mockSet);
 
             SetupUserRepoReturnsEmail(managerId, "managerClient@example.com");
-            SetupAdvisorRepoReturnsUserId(managerId, Guid.NewGuid());
+            SetupAdvisorRepoReturnsUserId(managerId, Guid.NewGuid(), true);
             SetupUserRepoReturnsEmail(managerId, "managerAdvisor@example.com");
 
             var result = await _service.GetAllByManagerIdAsync(managerId);
@@ -174,7 +174,7 @@ namespace FinanceAdvisor.Application.Tests.Services
             _mockRepository.Setup(r => r.GetAllAttached()).Returns(mockSet);
 
             SetupUserRepoReturnsEmail(clientId, "client@example.com");
-            SetupAdvisorRepoReturnsUserId(advisorId, advisorUserId);
+            SetupAdvisorRepoReturnsUserId(advisorId, advisorUserId, true);
             SetupUserRepoReturnsEmail(advisorUserId, "advisor@example.com");
 
             var result = await _service.GetAllByClientIdAsync(clientId);
@@ -204,7 +204,7 @@ namespace FinanceAdvisor.Application.Tests.Services
 
             SetupUserRepoReturnsEmail(entity.ClientId, "client@example.com");
             var advisorID = Guid.NewGuid();
-            SetupAdvisorRepoReturnsUserId(entity.AdvisorId, advisorID);
+            SetupAdvisorRepoReturnsUserId(entity.AdvisorId, advisorID, true);
             SetupUserRepoReturnsEmail(advisorID, "advisor@example.com");
 
             var result = await _service.GetByIdAsync(entity.Id);

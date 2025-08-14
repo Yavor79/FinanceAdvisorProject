@@ -11,5 +11,6 @@ namespace FinanceAdvisor.Application.DTOs
         public bool IsDeleted { get; set; }
 
         public string AdvisorName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }

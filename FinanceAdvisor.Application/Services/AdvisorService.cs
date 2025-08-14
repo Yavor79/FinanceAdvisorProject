@@ -30,8 +30,8 @@ namespace FinanceAdvisor.Application.Services
 
         private async Task<string> GetNameByIdAsync(Guid id)
         {
-            var advisor = await _repo.GetByIdAsync(id, true);
-            var user = await _userRepo.GetByIdAsync(advisor.UserId);
+           
+            var user = await _userRepo.GetByIdAsync(id);
             return user.Email;
         }
 
@@ -45,7 +45,7 @@ namespace FinanceAdvisor.Application.Services
 
             foreach (var a in advisors)
             {
-                var advisorName = await GetNameByIdAsync(a.AdvisorId);
+                var advisorName = await GetNameByIdAsync(a.UserId);
 
                 advisorDtos.Add(new AdvisorDto
                 {
@@ -70,7 +70,8 @@ namespace FinanceAdvisor.Application.Services
                 UserId = advisor.UserId,
                 Specialization = advisor.Specialization,
                 CreatedAt = advisor.CreatedAt,
-                IsDeleted = advisor.IsDeleted
+                IsDeleted = advisor.IsDeleted,
+                Email = await GetNameByIdAsync(advisor.AdvisorId)
             };
         }
 
@@ -90,7 +91,7 @@ namespace FinanceAdvisor.Application.Services
         public async Task<IEnumerable<AdvisorDto>> GetBySpecializationAsync(Specialization specialization)
         {
             var advisors = await _repo
-                .GetAllAttached()
+                .GetAllAttached(false)
                 .Where(u => specialization == u.Specialization)
                 .ToListAsync();
 
@@ -98,7 +99,7 @@ namespace FinanceAdvisor.Application.Services
 
             foreach (var a in advisors)
             {
-                var advisorName = await GetNameByIdAsync(a.AdvisorId);
+                var advisorName = await GetNameByIdAsync(a.UserId);
 
                 var dto = new AdvisorDto
                 {
@@ -119,19 +120,28 @@ namespace FinanceAdvisor.Application.Services
             return advisorDtos;
         }
 
-        public async Task CreateAsync(AdvisorDto dto)
+        public async Task<bool> CreateAsync(AdvisorDto dto)
         {
-            var advisor = new Advisor
+            var advisorExists = await _repo
+                .FirstOrDefaultAsync(a => a.UserId == dto.UserId);
+            if(advisorExists == null)
             {
-                AdvisorId = Guid.NewGuid(),
-                UserId = dto.UserId,
-                Specialization = dto.Specialization != 0 ? dto.Specialization : Specialization.Credit,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
+                var advisor = new Advisor
+                {
+                    AdvisorId = Guid.NewGuid(),
+                    UserId = dto.UserId,
+                    Specialization = dto.Specialization != 0 ? dto.Specialization : Specialization.Credit,
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                };
 
-            await _repo.AddAsync(advisor);
-            
+                await _repo.AddAsync(advisor);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task UpdateAsync(Guid advisorId, AdvisorDto dto)

@@ -9,7 +9,7 @@ namespace FinanceAdvisor.Application.Interfaces
         Task<AdvisorDto?> GetByIdAsync(Guid id);
         Task<AdvisorDto?> GetByUserIdAsync(Guid userId);
         Task<IEnumerable<AdvisorDto>> GetBySpecializationAsync(Specialization specialization);
-        Task CreateAsync(AdvisorDto dto);
+        Task<bool> CreateAsync(AdvisorDto dto);
         Task UpdateAsync(Guid advisorId, AdvisorDto dto);
         Task SoftDeleteAsync(Guid advisorId);
         Task<bool> RestoreAsync(Guid id);

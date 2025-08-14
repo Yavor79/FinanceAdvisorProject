@@ -61,6 +61,8 @@ namespace FinanceAdvisor.Application.Tests.Services
         {
             var advisor = new Advisor { AdvisorId = Guid.NewGuid(), UserId = Guid.NewGuid() };
             _advisorRepoMock.Setup(r => r.GetByIdAsync(advisor.AdvisorId, false)).ReturnsAsync(advisor);
+            var testUser = new ApplicationUser { Email = "user" };
+            _userRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(testUser);
 
             var result = await _service.GetByIdAsync(advisor.AdvisorId);
 
@@ -117,6 +119,7 @@ namespace FinanceAdvisor.Application.Tests.Services
             }.BuildMock();
 
             _advisorRepoMock.Setup(r => r.GetAllAttached(false)).Returns(advisors);
+            
             _userRepoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
                          .ReturnsAsync((Guid id) => new Domain.Entities.ApplicationUser { Id = id, Email = $"email-{id}@mail.com" });
 

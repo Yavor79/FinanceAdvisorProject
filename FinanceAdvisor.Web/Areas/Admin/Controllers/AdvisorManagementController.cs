@@ -136,6 +136,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
         
         public async Task<IActionResult> Restore(Guid id)
         {
+            //TODO: check if current advisor was implemented with User role and delete it before restore
             try
             {
                 var response = await _httpClient.GetWithRefreshAsync($"/api/v1/Advisors/restore/{id}", _tokenService);
@@ -155,7 +156,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             }
         }
 
-        public async Task<IActionResult> UpdateRole(Guid id, Roles role)
+        public async Task<IActionResult> UpdateRole(Guid id, Guid advisorId, Roles role)
         {
             string roleString = role.ToString();
             
@@ -176,7 +177,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
                     if (!response.IsSuccessStatusCode)
                         return View("Error", "Failed to update user role.");
 
-                    var resp = await _httpClient.DeleteWithRefreshAsync($"/api/v1/Advisors/{id}", _tokenService);
+                    var resp = await _httpClient.DeleteWithRefreshAsync($"/api/v1/Advisors/{advisorId}", _tokenService);
                     var _check = await RunChecks(resp);
                     if (_check != null) return _check;
 

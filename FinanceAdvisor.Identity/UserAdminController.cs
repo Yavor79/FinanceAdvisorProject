@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinanceAdvisor.Identity
 {
@@ -87,24 +88,32 @@ namespace FinanceAdvisor.Identity
         [HttpPost("create")]
         public async Task<bool> CreateAsync([FromBody]ApplicationUserDto dto)
         {
+            _logger.LogObjectProperties(dto, "[UserAdminController]");
             
-            Console.WriteLine(dto);
 
             if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
                 throw new ArgumentException("Invalid user data");
+            var userExists = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == dto.Email.ToLower() ||
+                u.UserName.ToLower() == dto.UserName.ToLower());
 
-            User user = new User
+            if(userExists == null)
             {
-                //Id = dto.Id,
-                Id = Guid.NewGuid(),
-                UserName = dto.UserName,
-                CreatedAt = dto.CreatedAt,
-                IsDeleted = dto.IsDeleted,
-                Email = dto.Email
-            };
-            await _userManager.CreateAsync(user);
-            var a = await _userManager.AddToRoleAsync(user, "User"); // by default
-            return true;
+                User user = new User
+                {
+                    //Id = dto.Id,
+                    Id = Guid.NewGuid(),
+                    UserName = dto.UserName,
+                    CreatedAt = dto.CreatedAt,
+                    IsDeleted = dto.IsDeleted,
+                    Email = dto.Email
+                };
+                await _userManager.CreateAsync(user);
+                var a = await _userManager.AddToRoleAsync(user, "User"); // by default
+                return true;
+            }
+
+            return false;
         }
     }
 

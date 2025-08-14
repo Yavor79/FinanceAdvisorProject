@@ -41,6 +41,7 @@ namespace FinanceAdvisor.API.Controllers
             return Ok(user);
         }
 
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet("deleted")]
         [ProducesResponseType(typeof(IEnumerable<ApplicationUserDto>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<ApplicationUserDto>>> GetAllDeleted()

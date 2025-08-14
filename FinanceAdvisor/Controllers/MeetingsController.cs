@@ -50,6 +50,10 @@ namespace FinanceAdvisor.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateMeetingDto dto)
         {
             var createdMeeting = await _service.CreateAsync(dto);
+            if (createdMeeting == null)
+            {
+                return BadRequest();
+            }
             return CreatedAtAction(nameof(GetById), new { id = createdMeeting.Id }, createdMeeting);
         }
 

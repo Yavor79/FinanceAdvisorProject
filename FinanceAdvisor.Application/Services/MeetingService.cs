@@ -1,17 +1,21 @@
 ﻿using FinanceAdvisor.Application.DTOs;
 using FinanceAdvisor.Application.Interfaces;
 using FinanceAdvisor.Application.IRepos;
+using FinanceAdvisor.Common.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace FinanceAdvisor.Application.Services
 {
     public class MeetingService : IMeetingService
     {
         private readonly IMeetingRepository _repository;
+        private readonly ILogger<MeetingService> _logger;
 
-        public MeetingService(IMeetingRepository repository)
+        public MeetingService(IMeetingRepository repository, ILogger<MeetingService> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<MeetingDto>> GetAllAsync()
@@ -63,31 +67,36 @@ namespace FinanceAdvisor.Application.Services
             };
         }
 
-        public async Task<MeetingDto> CreateAsync(CreateMeetingDto dto)
+        public async Task<MeetingDto?> CreateAsync(CreateMeetingDto dto)
         {
-            var meeting = new Domain.Entities.Meeting
+            var meetingExists = await _repository
+                .FirstOrDefaultAsync(m => m.CreditConsultationCycleId == dto.CreditConsultationCycleId
+                && m.ScheduledDateTime == dto.ScheduledDateTime);
+
+            if(meetingExists == null)
             {
-                Id = Guid.NewGuid(),
-                CreditConsultationCycleId = dto.CreditConsultationCycleId,
-                ScheduledDateTime = dto.ScheduledDateTime,
-                Type = dto.Type
-            };
+                var meeting = new Domain.Entities.Meeting
+                {
+                    Id = Guid.NewGuid(),
+                    CreditConsultationCycleId = dto.CreditConsultationCycleId,
+                    ScheduledDateTime = dto.ScheduledDateTime,
+                    Type = dto.Type
+                };
 
-            Console.WriteLine($"Id: {meeting.Id}");
-            Console.WriteLine($"CreditConsultationCycleId: {meeting.CreditConsultationCycleId}");
-            Console.WriteLine($"ScheduledDateTime: {meeting.ScheduledDateTime}");
-            Console.WriteLine($"Type: {meeting.Type}");
-            Console.WriteLine("-----------------------------");
+                _logger.LogObjectProperties(meeting, "[MeetingService]");
 
-            await _repository.AddAsync(meeting);
+                await _repository.AddAsync(meeting);
 
-            return new MeetingDto
-            {
-                Id = meeting.Id,
-                CreditConsultationCycleId = meeting.CreditConsultationCycleId,
-                ScheduledDateTime = meeting.ScheduledDateTime,
-                Type = meeting.Type
-            };
+                return new MeetingDto
+                {
+                    Id = meeting.Id,
+                    CreditConsultationCycleId = meeting.CreditConsultationCycleId,
+                    ScheduledDateTime = meeting.ScheduledDateTime,
+                    Type = meeting.Type
+                };
+            }
+
+            return null;
         }
 
         public async Task<bool> UpdateAsync(UpdateMeetingDto dto)

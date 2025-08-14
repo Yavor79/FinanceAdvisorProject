@@ -32,7 +32,7 @@ namespace FinanceAdvisor.Application.Services
             var user = await _userRepository.GetByIdAsync(cycle.ClientId);
             var userEmail = user?.Email;
 
-            var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId);
+            var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId, false);
             var advisorUser = await _userRepository.GetByIdAsync(advisor.UserId);
             var advisorUserEmail = advisorUser?.Email;
 
@@ -59,7 +59,7 @@ namespace FinanceAdvisor.Application.Services
                 var user = await _userRepository.GetByIdAsync(cycle.ClientId);
                 var userEmail = user?.Email;
 
-                var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId);
+                var advisor = await _advisorRepository.GetByIdAsync(cycle.AdvisorId, false);
                 var advisorUser = await _userRepository.GetByIdAsync(advisor.UserId);
                 var advisorUserEmail = advisorUser?.Email;
 
@@ -217,21 +217,30 @@ namespace FinanceAdvisor.Application.Services
         public async Task<ConsultationDto?> CreateAsync(CreateConsultationDto dto)
         {
             _logger.LogObjectProperties(dto, "[ConsultationService]");
+            var consultation = await _repository
+                .FirstOrDefaultAsync(c => c.AdvisorId == dto.AdvisorId
+                    && c.ClientId == dto.ClientId
+                    && c.ScheduledDateTime == dto.ScheduledDateTime);
 
-            var entity = new Domain.Entities.Consultation
+            if(consultation == null)
             {
-                ConsultationId = Guid.NewGuid(),
-                ClientId = dto.ClientId,
-                AdvisorId = dto.AdvisorId,
-                ScheduledDateTime = dto.ScheduledDateTime,
-                ConsultationType = dto.ConsultationType,
-                Status = 0,
-                CreatedAt = DateTime.UtcNow
-            };
+                var entity = new Domain.Entities.Consultation
+                {
+                    ConsultationId = Guid.NewGuid(),
+                    ClientId = dto.ClientId,
+                    AdvisorId = dto.AdvisorId,
+                    ScheduledDateTime = dto.ScheduledDateTime,
+                    ConsultationType = dto.ConsultationType,
+                    Status = 0,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            await _repository.AddAsync(entity);
+                await _repository.AddAsync(entity);
 
-            return await MapWithUserEmailsAsync(entity);
+                return await MapWithUserEmailsAsync(entity);
+            }
+
+            return null;
         }
 
         public async Task<bool> UpdateAsync(UpdateConsultationDto dto)

@@ -48,7 +48,7 @@ namespace FinanceAdvisor.Web.Areas.Admin.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Restore(Guid id)
         {
