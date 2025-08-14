@@ -7,7 +7,7 @@ namespace FinanceAdvisor.Common.Utilities
         /// <summary>
         /// Searches for a JSON file in the specified base directory (and optionally subdirectories)
         /// that ends with the given fileNamePattern (case-insensitive).
-        /// </summary>
+        /// </summary> 
         public static string? FindJsonFile(string fileNamePattern, bool searchSubDirectories = true)
         {
             var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

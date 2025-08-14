@@ -9,6 +9,7 @@ namespace FinanceAdvisor.Common.Logging
         /// <summary>
         /// Logs all public instance properties of a single object.
         /// </summary>
+        ///
         public static void LogObjectProperties<T>(this ILogger logger, T? obj, string context = "")
         {
             if (obj == null)
